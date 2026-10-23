@@ -386,7 +386,10 @@ body.mesa-full #top{flex:0 0 auto}
 body.mesa-full main{flex:1 1 auto;min-height:0;width:100%;max-width:none;margin:0;padding:0;display:flex;flex-direction:column}
 body.mesa-full .mbar{flex:0 0 auto}
 body.mesa-full .mesa-wrap{flex:1 1 auto;min-height:0;max-height:none;width:100%;max-width:none;border:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-</style></head><body><div id="top"></div><main id="app"></main><div id="toast" class="toast"></div><script>
+</style></head><body><div id="top"></div><main id="app"></main><div id="toast" class="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script><script>
 const pct = L => 10 + 9 * L;
 const REGION_ORDER = ['Cabeça', 'Pescoço', 'Torso', 'Braços', 'Mãos', 'Pernas', 'Pés'];
 const REGIONS = {
@@ -618,7 +621,27 @@ function woundBlock(f, w) {
 const KEY = 'zomboid-jogador-v2';
 let S, NEXT = 0;
 const fresh = () => ({ fs: [], next: 1, sel: { P: 0, E: 0 }, reg: { P: '', E: '' }, atk: 'P', log: [], hordas: [], hn: 1, tab: 'combate', sq: '', sqloc: '', sheets: [], sid: 1, auto: false, corpses: [], cn: 1, press: 1, clock: 0, turns: 0, hist: [] });
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } };
+
+let fbDb = null;
+let fbReady = false;
+let fbApplying = false;
+let fbSaveTimer = null;
+
+const save = () => {
+  try {
+      localStorage.setItem(KEY, JSON.stringify(S));
+        } catch (e) {}
+
+          if (!fbReady || !fbDb || fbApplying) return;
+
+            clearTimeout(fbSaveTimer);
+              fbSaveTimer = setTimeout(() => {
+                  fbDb.ref('mesa/estado').set(S).catch(err => {
+                        console.error('Erro ao sincronizar a mesa:', err);
+                            });
+                              }, 300);
+                              };
+
 function load() { try { const j = localStorage.getItem(KEY); S = Object.assign(fresh(), j ? JSON.parse(j) : {}); } catch (e) { S = fresh(); } S.auto = true; delete S.engol; if (!S.sheets.length && !S.fs.length) seed(); else if (!S.fs.length) { addF('P', 'humano'); addF('E', 'zumbi'); } fixState(); }
 function seed() {
   const skills = {}; ['Lâminas Curtas', 'Lâminas Longas', 'Machados', 'Lanças', 'Contundentes Curtos', 'Contundentes Longos', 'Agilidade'].forEach(k => { skills[k] = 0; }); skills['Machados'] = 5;
@@ -1946,5 +1969,75 @@ function init() {
   document.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.id === 'dr' || e.target.id === 'dg')) { e.preventDefault(); resolve(); } else if (e.key === 'Enter' && e.target.dataset && e.target.dataset.enter === 'pregister') { e.preventDefault(); PG.ui.roll = e.target.value; act('pregister', {}, e.target); } else if (e.key === 'Enter' && e.target.dataset && e.target.dataset.enter === 'pqreg') { e.preventDefault(); PG.ui.qd = e.target.value; act('pqreg', {}, e.target); } else if (e.key === 'Enter' && /^tk\d+$/.test(e.target.id)) { e.preventDefault(); act('tapply', { id: e.target.id.slice(2) }, e.target); } });
 }
 if (typeof document !== 'undefined' && typeof process === 'undefined') init();
+
+
+/* ===== Firebase: login e mesa compartilhada ===== */
+const rpgFirebaseConfig = {
+  apiKey: "AIzaSyDx6avHEKnzClrP7rgBF9uWD_s8kyUiBzw",
+    authDomain: "projeto-tabletop.firebaseapp.com",
+      databaseURL: "https://projeto-tabletop-default-rtdb.firebaseio.com",
+        projectId: "projeto-tabletop",
+          storageBucket: "projeto-tabletop.firebasestorage.app",
+            messagingSenderId: "496758702006",
+              appId: "1:496758702006:web:18e7071e7670afd001cb17"
+              };
+
+              firebase.initializeApp(rpgFirebaseConfig);
+
+              const rpgFirebaseAuth = firebase.auth();
+              fbDb = firebase.database();
+
+              async function conectarMesaFirebase() {
+                const email = prompt("E-mail compartilhado da mesa:");
+                  if (!email) return;
+
+                    const senha = prompt("Senha compartilhada da mesa:");
+                      if (!senha) return;
+
+                        try {
+                            await rpgFirebaseAuth.signInWithEmailAndPassword(email, senha);
+
+                                const ref = fbDb.ref("mesa/estado");
+                                    const snapshot = await ref.once("value");
+
+                                        if (snapshot.exists()) {
+                                              fbApplying = true;
+                                                    S = Object.assign(fresh(), snapshot.val());
+                                                          fixState();
+                                                                localStorage.setItem(KEY, JSON.stringify(S));
+                                                                      render();
+                                                                            fbApplying = false;
+                                                                                } else {
+                                                                                      await ref.set(S);
+                                                                                          }
+
+                                                                                              fbReady = true;
+
+                                                                                                  ref.on("value", snapshot => {
+                                                                                                        if (!snapshot.exists()) return;
+
+                                                                                                              const recebido = snapshot.val();
+
+                                                                                                                    if (JSON.stringify(recebido) === JSON.stringify(S)) return;
+
+                                                                                                                          fbApplying = true;
+                                                                                                                                S = Object.assign(fresh(), recebido);
+                                                                                                                                      fixState();
+                                                                                                                                            localStorage.setItem(KEY, JSON.stringify(S));
+                                                                                                                                                  render();
+                                                                                                                                                        fbApplying = false;
+                                                                                                                                                            });
+
+                                                                                                                                                                console.log("Mesa conectada ao Firebase.");
+                                                                                                                                                                  } catch (erro) {
+                                                                                                                                                                      fbReady = false;
+                                                                                                                                                                          fbApplying = false;
+                                                                                                                                                                              console.error("Falha na conexão:", erro);
+                                                                                                                                                                                  alert("Não foi possível conectar. Confira o e-mail, a senha e as configurações do Firebase.");
+                                                                                                                                                                                    }
+                                                                                                                                                                                    }
+
+                                                                                                                                                                                    conectarMesaFirebase();
+                                                                                                                                                                                    
 
 </script></body></html>
