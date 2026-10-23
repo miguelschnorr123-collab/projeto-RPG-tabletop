@@ -2065,7 +2065,7 @@ const rpgFirebaseConfig = {
                                                                                                                                                                       fbReady = false;
                                                                                                                                                                           fbApplying = false;
                                                                                                                                                                               console.error("Falha na conexão:", erro);
-                                                                                                                                                                                  alert("Não foi possível conectar. Confira o e-mail, a senha e as configurações do Firebase.");
+                                                                                                                                                                                  alert("Erro Firebase: " + (erro.code || erro.message || String(erro)));
                                                                                                                                                                                     }
                                                                                                                                                                                     }
 
