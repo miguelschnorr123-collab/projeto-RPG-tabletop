@@ -1,0 +1,1950 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Jogador — Project Zomboid RPG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Share+Tech+Mono&family=Special+Elite&family=Stardos+Stencil:wght@700&family=Caveat:wght@600&display=swap" rel="stylesheet"><style>
+:root{--bg:#171b19;--sf:#222824;--ink:#e8eae4;--mu:#9aa59d;--rule:#3a423d;--acc:#d9a441;--red:#e0624f;--grn:#4fae78}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,Segoe UI,sans-serif}
+#top nav{display:flex;gap:0;border-bottom:2px solid var(--ink);position:sticky;top:0;background:var(--bg);z-index:5}
+#top nav button{flex:0 0 auto;padding:.8rem 2rem;background:none;border:0;color:var(--mu);font:700 1rem inherit;cursor:pointer}
+#top nav button.on{color:var(--bg);background:var(--ink)}
+main{max-width:1500px;margin:0 auto;padding:1rem 1.2rem 4rem}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+h2{margin:1.2rem 0 .5rem;border-bottom:2px solid var(--ink);font-weight:400}
+.card{background:var(--sf);border:2px solid var(--rule);padding:.8rem;margin-bottom:.8rem}.card.dead{opacity:.55}
+.tabs{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem}
+.ft{background:var(--sf);color:var(--ink);border:2px solid var(--rule);padding:.35rem .7rem;cursor:pointer;font-weight:600}
+.ft small{display:block;color:var(--mu);font-weight:400}.ft.on{border-color:var(--ink);background:var(--ink);color:var(--bg)}.ft.on small{color:#333}
+.ft.dead{text-decoration:line-through}.ft.turn{box-shadow:0 0 0 2px var(--acc)}.ft.add{border-style:dashed;color:var(--mu)}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:flex-end;margin:.4rem 0}
+label{display:flex;flex-direction:column;font-size:.8rem;color:var(--mu);gap:.15rem}label.ck{flex-direction:row;align-items:center;color:var(--ink);gap:.4rem}
+input[type=number],input[type=text],select{background:var(--bg);color:var(--ink);border:2px solid var(--rule);padding:.4rem .5rem;font:inherit}input[type=number]{width:6.2rem}
+button{font:inherit;cursor:pointer;background:var(--sf);color:var(--ink);border:2px solid var(--rule);padding:.4rem .8rem}button:hover{border-color:var(--ink)}
+button.go{background:var(--acc);color:#1b1b1b;border-color:var(--acc);font-weight:700;padding:.5rem 1.2rem}button.lnk{border:0;background:none;color:var(--red);text-decoration:underline}
+.ctl{position:sticky;bottom:0;background:var(--bg);border-top:2px solid var(--ink);padding:.6rem 0;margin-top:.6rem}
+.seg{display:inline-flex;border:2px solid var(--ink)}.seg button{border:0;padding:.5rem 1.4rem;font-weight:700}.seg button.on{background:var(--ink);color:var(--bg)}
+.pb{display:block;height:.7rem;background:#2f3833;margin:.3rem 0}.pb b{display:block;height:100%;background:var(--grn)}.pb.life b{background:var(--red)}
+.hint{color:var(--mu);font-size:.85rem;margin:.3rem 0}.tg{padding:0 .4rem;border:1px solid}.tg.y{color:var(--acc)}.tg.r{color:var(--red)}.tg.g{color:var(--grn)}
+.sil{display:flex;justify-content:center}.bodymap{width:230px;max-width:100%}
+.rg{fill:#8fa597;stroke:#0d100e;stroke-width:1.5;cursor:pointer}.rg:hover{fill:var(--acc)}.rg.sel{stroke:var(--red);stroke-width:4}.bodymap.zombie .rg{fill:#9bab7e}
+.bodymap text{font:700 11px sans-serif;fill:#101410;pointer-events:none;text-anchor:middle}
+.agrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-top:.4rem}.agrid input{width:100%}
+.wl{list-style:none;padding:0;margin:.4rem 0}.wl li{display:flex;justify-content:space-between;gap:.5rem;padding:.3rem 0;border-top:1px solid var(--rule)}.wl small{display:block;color:var(--mu)}
+.log{padding-left:1.2rem;margin:.5rem 0;max-height:12rem;overflow:auto;font-size:.88rem}.log li:first-child{color:var(--acc)}
+.res{border-left:5px solid var(--acc);padding:.5rem .8rem;background:var(--bg)}
+textarea{width:100%;background:var(--bg);color:var(--ink);border:2px solid var(--rule);padding:.4rem .5rem;font:inherit}select.ft{padding:.5rem}.wb{list-style:none;padding:.4rem 0;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:.2rem}.whead{display:flex;justify-content:space-between;gap:.5rem}details{margin:.4rem 0}summary{cursor:pointer;color:var(--mu)}
+.toast{position:fixed;left:50%;bottom:5rem;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.6rem 1.2rem;display:none;z-index:20}.toast.on{display:block}
+.pop{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center}.popbg{position:absolute;inset:0;background:rgba(0,0,0,.65)}.popc{position:relative;background:var(--sf);border:2px solid var(--ink);padding:1rem;width:92%;max-width:34rem;max-height:80vh;overflow:auto}.popc h2{margin-top:0}
+.pgw button,.pgw input,.pgw select,.pgw textarea{ font: inherit; color: inherit; }
+.pgw button:focus-visible,.pgw input:focus-visible,.pgw textarea:focus-visible,.pgw summary:focus-visible{ outline: 3px solid var(--tape); outline-offset: 2px; }
+.pgw .estl{ margin-bottom: .8rem; }
+.pgw .estl b{ color: var(--ink); }
+.pgw .catcard{ padding: 1.1rem 0 .6rem; }
+.pgw .ct{ display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.pgw h1{ font-family: var(--f-display); font-weight: 400; font-size: 1.7rem; line-height: 1.1; margin: 0; }
+.pgw .hint{ color: var(--muted); font-size: .9rem; margin: .3rem 0 .8rem; }
+.pgw .xpl{ font-size: .9rem; margin: .2rem 0 .3rem; font-variant-numeric: tabular-nums; }
+.pgw .pb{ display: block; height: .55rem; background: var(--bar); }
+.pgw .pb b{ display: block; height: 100%; background: var(--tape); }
+.pgw .pb.cat b{ background: var(--ink); }
+.pgw .st{ display: inline-flex; align-items: center; border: 2px solid var(--ink); flex: 0 0 auto; }
+.pgw .st button{ width: 2.5rem; height: 2.3rem; background: none; border: 0; font-size: 1.2rem; font-weight: 700; cursor: pointer; }
+.pgw .st b{ min-width: 1.9rem; text-align: center; font-variant-numeric: tabular-nums; }
+.pgw .skills{ list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+.pgw .sk{ border-bottom: 1px solid var(--rule); }
+.pgw .sk.on{ background: var(--surface); box-shadow: inset 5px 0 0 var(--tape); }
+.pgw .sk.inst .nm{ font-family: var(--f-display); font-weight: 400; font-size: 1.05rem; }
+.pgw .skrow{ display: flex; align-items: center; gap: .6rem; padding-right: .5rem; }
+.pgw .pick{ flex: 1; display: grid; gap: .25rem; background: none; border: 0; text-align: left; padding: .75rem .8rem; cursor: pointer; min-width: 0; }
+.pgw .nm{ font-weight: 700; }
+.pgw .sub{ color: var(--muted); font-size: .86rem; font-variant-numeric: tabular-nums; }
+.pgw .xpedit{ display: flex; align-items: center; gap: .5rem; padding: .2rem .8rem .7rem; font-weight: 600; font-size: .9rem; }
+.pgw input[type=number],.pgw input[type=text],.pgw textarea{ width: 100%; background: var(--bg); border: 2px solid var(--rule); padding: .6rem .7rem; border-radius: 0; }
+.pgw .xpedit input{ width: 7rem; padding: .35rem .5rem; }
+.pgw .panel{ padding: .9rem 1rem 1rem; background: var(--surface); }
+.pgw .panel.inline{ border-top: 1px solid var(--rule); padding-left: 1.1rem; }
+.pgw .panel.side{ border-left: 6px solid var(--tape); }
+.pgw .panel.empty{ border-left-color: var(--rule); color: var(--muted); }
+.pgw .panel h3{ font-family: var(--f-display); font-weight: 400; font-size: 1.2rem; margin: 0 0 .2rem; }
+.pgw .what{ margin: 0 0 .8rem; }
+.pgw .fld{ display: grid; gap: .3rem; margin: 0 0 .9rem; font-weight: 600; font-size: .92rem; }
+.pgw .seg{ display: flex; border: 2px solid var(--ink); }
+.pgw .seg button{ flex: 1; background: none; border: 0; padding: .6rem .4rem; font-weight: 600; cursor: pointer; }
+.pgw .seg button + button{ border-left: 2px solid var(--ink); }
+.pgw .seg button.on{ background: var(--ink); color: var(--bg); }
+.pgw .btn{ display: block; width: 100%; background: var(--ink); color: var(--bg); border: 2px solid var(--ink); padding: .8rem 1rem; font-weight: 700; cursor: pointer; }
+.pgw .btn.alt{ background: none; color: var(--ink); }
+.pgw .btn.ghost{ background: none; color: var(--muted); border-color: var(--rule); font-weight: 600; }
+.pgw .btn.danger{ background: var(--tr); border-color: var(--tr); color: #fff; }
+.pgw .btns{ display: flex; flex-wrap: wrap; gap: .6rem; margin: 0 0 1rem; }
+.pgw .btns .btn{ flex: 1 1 9rem; width: auto; }
+.pgw .last{ margin-top: .8rem; padding: .6rem .8rem; border-left: 5px solid var(--rule); background: var(--bg); font-size: .92rem; }
+.pgw .last.ok{ border-left-color: var(--tg); }
+.pgw .last.ko{ border-left-color: var(--tr); }
+.pgw .pend{ padding: 1.6rem 0 .5rem; }
+.pgw h2{ font-family: var(--f-display); font-weight: 400; font-size: 1.3rem; margin: 0 0 .5rem; padding-bottom: .25rem; border-bottom: 2px solid var(--ink); }
+.pgw .cnt{ background: var(--ink); color: var(--bg); padding: 0 .5rem; font-size: .9rem; margin-left: .3rem; }
+.pgw .plist{ list-style: none; margin: 0; padding: 0; }
+.pgw .plist li{ display: flex; justify-content: space-between; align-items: center; gap: .6rem; padding: .55rem 0; border-bottom: 1px solid var(--rule); }
+.pgw .plist span{ display: block; color: var(--muted); font-size: .86rem; }
+.pgw .x{ width: 2.4rem; height: 2.4rem; border: 0; background: none; font-size: 1.5rem; cursor: pointer; }
+.pgw .report{ margin: 1rem 0 .6rem; padding: .9rem 1rem 1rem; background: var(--surface); border-left: 6px solid var(--tape); }
+.pgw .report h3{ font-family: var(--f-display); font-weight: 400; font-size: 1.1rem; margin: 1rem 0 .3rem; }
+.pgw .up{ background: var(--tape); color: var(--tape-ink); padding: .5rem .8rem; font-weight: 700; margin: 0 0 .4rem; }
+.pgw .log{ list-style: none; margin: 0 0 .5rem; padding: 0; font-size: .9rem; }
+.pgw .log li{ padding: .4rem 0; border-bottom: 1px solid var(--rule); }
+.pgw textarea{ font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; margin: .6rem 0; }
+.pgw .btn.rest{ width: auto; flex: 0 0 auto; padding: .8rem 1.8rem; font-size: 1.05rem; background: var(--tape); border-color: var(--ink); color: var(--tape-ink); }
+.pgw .syn{ margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--rule); }
+.pgw .syn h4{ font-family: var(--f-display); font-weight: 400; font-size: 1.05rem; margin: 0 0 .3rem; }
+.pgw .syn .hint{ margin: .3rem 0; }
+.pgw .chips{ display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 .4rem; }
+.pgw .chipb{ background: var(--bg); border: 2px solid var(--rule); padding: .35rem .6rem; font-size: .88rem; font-weight: 600; cursor: pointer; }
+.pgw .chipb em{ font-style: normal; font-weight: 400; color: var(--muted); }
+.pgw h1.pg{ font-family: var(--f-display); font-weight: 400; font-size: 1.7rem; line-height: 1.1; margin: 1.2rem 0 .4rem; }
+.pgw .cats{ border-bottom: 2px solid var(--ink); }
+.pgw details.cat{ border-top: 2px solid var(--ink); }
+.pgw details.cat > summary{ list-style: none; cursor: pointer; padding: .85rem 0; display: grid; grid-template-columns: 1fr auto; gap: .35rem .8rem; align-items: baseline; }
+.pgw details.cat > summary::-webkit-details-marker{ display: none; }
+.pgw details.cat > summary::after{ content: ""; grid-column: 2; grid-row: 1; justify-self: end; width: .55rem; height: .55rem; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg) translateY(-2px); margin-right: .2rem; display: none; }
+.pgw .cn{ font-family: var(--f-display); font-size: 1.15rem; }
+.pgw .cl{ color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.pgw details.cat > summary .pb{ grid-column: 1 / -1; }
+.pgw details.cat[open] > summary .cn::before{ content: "− "; }
+.pgw details.cat:not([open]) > summary .cn::before{ content: "+ "; }
+.pgw .catbody{ padding-bottom: .8rem; }
+.pgw .mm{ background: var(--surface); padding: .7rem .8rem .5rem; margin-bottom: .2rem; }
+.pgw .mmh{ display: flex; justify-content: space-between; align-items: center; gap: .8rem; }
+.pgw .mmh .sub{ display: block; }
+.pgw .skills{ margin-top: .2rem; }
+.pgw .panel{ margin: 0 .8rem .8rem 1.1rem; }
+.pgw .center{ text-align: center; }
+.pgw .panel.aim{ margin: 0 0 1rem; }
+.pgw .armor{ border: 2px solid var(--rule); margin: 0 0 .9rem; background: var(--surface); }
+.pgw .armor > summary{ cursor: pointer; padding: .7rem .8rem; font-weight: 600; }
+.pgw .armor summary small{ display: block; font-weight: 400; color: var(--muted); font-size: .8rem; margin-top: .15rem; }
+.pgw .armor .hint{ padding: 0 .8rem; }
+.pgw .res{ background: var(--surface); border-left: 6px solid var(--rule); padding: .9rem 1rem 1rem; margin: .4rem 0 1rem; }
+.pgw .res.ok{ border-left-color: var(--tg); }
+.pgw .res.ko{ border-left-color: var(--tr); }
+.pgw .res .big{ font-family: var(--f-display); font-size: 1.6rem; line-height: 1.1; }
+.pgw .res .sub{ color: var(--muted); font-size: .92rem; margin: .2rem 0 .6rem; }
+.pgw dl{ display: grid; grid-template-columns: 1fr auto; gap: .3rem 1rem; margin: 0 0 .7rem; font-size: .95rem; }
+.pgw dt{ color: var(--muted); }
+.pgw dd{ margin: 0; font-weight: 700; text-align: right; }
+.pgw .wb{ border-top: 1px solid var(--rule); padding: .6rem 0 .2rem; font-size: .93rem; }
+.pgw .note{ color: var(--muted); font-size: .88rem; }
+.pgw .agrid{ display: grid; grid-template-columns: 1fr 1fr; gap: .5rem .8rem; padding: .3rem .8rem .5rem; }
+.pgw .ar{ display: grid; gap: .2rem; font-size: .85rem; font-weight: 600; }
+.pgw .pcin{ display: flex; align-items: center; gap: .3rem; font-weight: 400; }
+.pgw .pcin input{ padding: .4rem .5rem; }
+.pgw .pcin input:disabled{ opacity: .55; }
+.pgw .btn.small{ width: auto; flex: 0 0 auto; padding: .4rem .8rem; font-size: .88rem; }
+.pgw{--surface:var(--sf);--muted:var(--mu);--bar:#2f3833;--tape:var(--acc);--tape-ink:#1b1b1b;--tg:var(--grn);--tr:var(--red);--panic:var(--red);--f-display:'Courier New',monospace;--f-body:inherit;margin-top:1rem}.pgw .ctl{margin-top:1rem}
+
+/* ===== Tema: instalação de pesquisa (estilo Abiotic Factor) ===== */
+:root{--bg:#0e1214;--sf:#172024;--ink:#dde6e1;--mu:#86978f;--rule:#2c3b40;--acc:#f0a22e;--red:#e0553a;--grn:#4cc3a0;--f1:'Chakra Petch','Rajdhani','Segoe UI',system-ui,sans-serif;--f2:'Share Tech Mono',ui-monospace,Consolas,monospace}
+body{font-family:var(--f1);background-color:var(--bg);background-image:linear-gradient(rgba(76,195,160,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(76,195,160,.045) 1px,transparent 1px),radial-gradient(ellipse at 50% 0,rgba(240,162,46,.07),transparent 60%);background-size:32px 32px,32px 32px,100% 100%;background-attachment:fixed}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px)}
+#top{position:sticky;top:0;z-index:8;background:#090d0e}
+#top nav{position:static;background:#090d0e;border-bottom:0;align-items:stretch}
+#top nav::before{content:"PZ-RPG ▸ TERMINAL DO SOBREVIVENTE";font-family:var(--f2);color:var(--acc);padding:0 1.4rem 0 1.2rem;align-self:center;letter-spacing:.14em;font-size:.78rem;border-right:1px solid var(--rule);margin-right:.5rem;white-space:nowrap}
+#top nav button{font-family:var(--f2);text-transform:uppercase;letter-spacing:.12em;font-size:.9rem;padding:.85rem 1.6rem;border-bottom:3px solid transparent}
+#top nav button:hover{color:var(--acc)}
+#top nav button.on{background:var(--acc);color:#0b0f10;clip-path:polygon(0 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%)}
+#top::after{content:"";display:block;height:7px;background:repeating-linear-gradient(-45deg,var(--acc) 0 12px,#0b0f10 12px 24px)}
+h2{font-family:var(--f1);font-weight:600;text-transform:uppercase;letter-spacing:.16em;font-size:1rem;color:var(--acc);border-bottom:1px solid var(--rule);padding-bottom:.3rem}
+h2::before{content:"▌";margin-right:.55rem}
+.card h3::before,.popc h3::before{content:"// ";color:var(--acc)}
+.card,.popc,.res,.pgw .report,.pgw .mm,.pgw .panel{background:var(--sf);border:1px solid var(--rule);border-left:3px solid var(--acc)}
+.card,.popc{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+button{border-radius:0;font-family:var(--f2);text-transform:uppercase;letter-spacing:.06em;font-size:.85rem;background:#1b282d;border:1px solid var(--rule)}
+button:hover{border-color:var(--acc);color:var(--acc)}
+button.go,.pgw .btn{background:var(--acc);color:#0b0f10;border-color:var(--acc);font-weight:700}
+button.go:hover,.pgw .btn:hover{color:#0b0f10;filter:brightness(1.12)}
+.pgw .btn.alt,.pgw .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+button.lnk{text-transform:none;letter-spacing:0}
+.ft{font-family:var(--f1);text-transform:none;letter-spacing:0}
+.ft.on{background:var(--acc);color:#0b0f10;border-color:var(--acc)}.ft.on small{color:#2a2a2a}
+.seg{border:1px solid var(--acc)}.seg button{border:0}.seg button.on{background:var(--acc);color:#0b0f10}
+.seg button[data-v="panico"].on{background:var(--red);color:#fff}
+input[type=number],input[type=text],select,textarea{background:#0b1012;border:1px solid var(--rule);border-radius:0;font-family:var(--f2);color:var(--ink)}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+label{font-family:var(--f2);text-transform:uppercase;letter-spacing:.06em;font-size:.72rem}label.ck{text-transform:none;font-family:var(--f1);letter-spacing:0;font-size:.9rem}
+.pb{background:#0b1012;border:1px solid var(--rule);height:.65rem}.pb b{background:var(--acc)}.pb.life b{background:var(--red)}
+.tg{font-family:var(--f2);text-transform:uppercase;letter-spacing:.05em;font-size:.72rem}
+.hint{font-family:var(--f2);font-size:.8rem}
+.log{font-family:var(--f2);font-size:.82rem}
+.ctl{background:#090d0e;border-top:2px solid var(--acc)}
+.res{border-left-color:var(--acc)}
+.rg{fill:var(--grn);stroke:#071012}.rg.sel{stroke:var(--acc);stroke-width:4}.bodymap.zombie .rg{fill:#b9803c}
+.bodymap text{fill:#fff;stroke:#000;stroke-width:2.2px;paint-order:stroke;font-family:var(--f2)}
+.bodymap text.side{text-anchor:start;font-size:7.5px;stroke:none;fill:var(--mu);font-weight:400}
+.bodymap text.side:last-of-type{text-anchor:end}
+.toast{background:var(--acc);color:#0b0f10;font-family:var(--f2);text-transform:uppercase;letter-spacing:.05em;border:1px solid #000}
+.popbg{backdrop-filter:blur(2px)}
+.pgw{--f-display:var(--f1);--f-body:var(--f1)}
+.pgw h1.pg,.pgw h2,.pgw .cn,.pgw .panel h3,.pgw .report h3,.pgw .syn h4{font-family:var(--f1);text-transform:uppercase;letter-spacing:.1em}
+.pgw h1.pg{color:var(--acc);font-size:1.15rem}
+.pgw details.cat{border-top:1px solid var(--acc)}
+.pgw .cats{border-bottom:1px solid var(--acc)}
+.pgw .st{border:1px solid var(--acc)}.pgw .st button{font-size:1.1rem}
+.pgw .up{background:var(--acc);color:#0b0f10;font-family:var(--f2);text-transform:uppercase}
+.pgw .last,.pgw .chipb{font-family:var(--f2)}
+.pgw .sk.on{background:#1d2b30;box-shadow:inset 4px 0 0 var(--acc)}
+@media (min-width:1000px){
+ body{font-size:16px}
+ main{max-width:1780px;padding:1.4rem 2.2rem 4rem}
+ .fgrid{display:grid;grid-template-columns:minmax(340px,440px) 1fr;gap:1.8rem;align-items:start}
+ .fside{position:sticky;top:4.6rem;max-height:calc(100vh - 5.4rem);overflow:auto;padding-right:.3rem}
+ .bodymap{width:230px}
+ .fside .bodymap{width:250px}
+ .cols{gap:1.8rem}
+ .pgw .cats{display:grid;grid-template-columns:1fr 1fr;gap:0 2rem;align-items:start;border-bottom:0}
+ .pgw .pend,.pgw .report{grid-column:1/-1}
+}
+@media (max-width:999px){#top nav::before{display:none}.fside{margin-bottom:1rem}}
+
+/* ===== Tabletop ===== */
+.mesa-wrap{position:relative;z-index:61;width:fit-content;max-width:100%;overflow:auto;border:1px solid var(--rule);background:#070b0c;max-height:calc(100vh - 15rem);min-height:300px}
+#mboard{position:relative;background:radial-gradient(ellipse at center,#14201f,#0b1214)}
+.mimg{position:absolute;z-index:0;background-size:100% 100%;background-repeat:no-repeat}
+#mboard{overflow:hidden}#mboard.imv{cursor:move;touch-action:none}#mboard.imv .mtk{cursor:grab}
+#mscale{width:12rem;padding:0}
+.mscl{flex-direction:row;align-items:center;gap:.6rem}
+.mgrid{position:absolute;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(rgba(76,195,160,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(76,195,160,.16) 1px,transparent 1px)}
+.mgrid.img{background-image:linear-gradient(rgba(255,255,255,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.28) 1px,transparent 1px)}
+button:disabled{opacity:.4;cursor:not-allowed}button:disabled:hover{border-color:var(--rule);color:inherit}
+#mboard.placing{cursor:crosshair;outline:2px dashed var(--acc);outline-offset:-2px}
+.mtk{position:absolute;width:48px;height:48px;display:flex;flex-direction:column;align-items:center;padding-top:1px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;z-index:2}
+.mtk i{display:flex;width:34px;height:34px;border-radius:50%;align-items:center;justify-content:center;background:#0b1012;border:2px solid var(--grn);color:var(--grn)}
+.mtk i svg{width:22px;height:22px;fill:currentColor}
+.mtk small{font:600 10px/1.1 var(--f1);max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);text-shadow:0 0 3px #000,0 0 3px #000;margin-top:2px}
+.mtk.n i{border-color:var(--acc);color:var(--acc)}.mtk.z i{border-color:var(--red);color:var(--red)}
+.mtk.sel i{box-shadow:0 0 0 3px var(--acc),0 0 12px var(--acc)}
+.mtk.drag{cursor:grabbing;z-index:4;opacity:.9}.mtk.dead{opacity:.4}.mtk.dead small{text-decoration:line-through}
+.mtk:focus-visible{outline:2px solid var(--acc)}
+.mact{position:absolute;z-index:5;display:flex;gap:.3rem;transform:translateX(-50%) scale(var(--ik,1));transform-origin:50% 0;white-space:nowrap}
+.msz{position:relative;overflow:hidden;margin:0 auto}.msz #mboard{position:absolute;left:0;top:0;transform-origin:0 0}.mzoom{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}.mzoom b{min-width:3.2rem;text-align:center}
+.mact button{padding:.3rem .6rem}
+.mleg{margin:.4rem 0}
+#top{z-index:70}.pop{z-index:80}.toast{z-index:90}
+@media (max-width:999px){#top nav{overflow-x:auto;scrollbar-width:none}#top nav button{white-space:nowrap;flex:0 0 auto}}
+.mapcode{font:12px/1.35 ui-monospace,Consolas,monospace}.pop p{margin:.3rem 0 .8rem}
+
+.fx{position:fixed;inset:0;z-index:200;background:#000;opacity:0;transition:opacity .45s ease}.fx.in{opacity:1}.fx.out{opacity:0;transition:opacity .55s ease}.fx.slow.out{transition-duration:.95s}.fx .ecg{transition:opacity .6s ease}.fx.end .ecg{opacity:0}
+.fx .ecg{position:absolute;left:0;top:50%;width:100%;height:34vh;transform:translateY(-50%);overflow:visible;filter:drop-shadow(0 0 7px #ff2a1a) drop-shadow(0 0 18px #c40d00)}
+.fx .ecg path{fill:none;stroke:#ff3b2b;stroke-width:3.2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1}
+.fx.in .ecg path{animation:ecgdraw 1.9s linear .5s forwards}
+@keyframes ecgdraw{to{stroke-dashoffset:0}}
+body{transition:background-color .6s ease}
+body.panico{--bg:#150a0a;--sf:#241312;--ink:#f1e2dd;--mu:#b0908a;--rule:#4d2723;--acc:#e0553a;--red:#ff4a33;--grn:#c9894b}
+body.panico #top nav{border-bottom-color:var(--red)}body.panico h2{border-bottom-color:var(--red)}
+body.panico #top nav button.on{background:var(--red);color:#1a0705}
+body.panico .card{border-color:#5a2a25}
+body.panico::after{content:"";position:fixed;inset:0;z-index:40;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(130,0,0,.5) 100%);animation:pnpulse 1.15s ease-in-out infinite}
+@keyframes pnpulse{0%,100%{opacity:.55}12%{opacity:1}24%{opacity:.6}36%{opacity:.95}60%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){body.panico::after{animation:none;opacity:.8}.fx,.fx.out{transition-duration:.01s}}
+
+.rg:hover{fill:var(--acc)!important}
+.rg.hitflash{animation:rgflash .8s ease-out}
+@keyframes rgflash{0%{fill:#ff2a1a;fill-opacity:1;stroke:#fff;stroke-width:6}100%{}}
+.sil.miss{animation:misswig .38s ease-out}
+@keyframes misswig{20%{transform:translateX(-7px) rotate(-1.2deg)}45%{transform:translateX(6px) rotate(1deg)}70%{transform:translateX(-3px)}}
+.who.turn,.ft.turn{animation:turnglow 1.5s ease-in-out infinite}
+.who.turn{color:var(--acc);text-shadow:0 0 8px var(--acc)}
+@keyframes turnglow{0%,100%{box-shadow:0 0 0 2px var(--acc)}50%{box-shadow:0 0 0 2px var(--acc),0 0 14px var(--acc)}}
+.who.turn{box-shadow:none!important}
+.hitvig{position:fixed;inset:0;z-index:150;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 28%,rgba(190,0,0,.8) 100%);opacity:0;animation:hitvig .85s ease-out forwards}
+@keyframes hitvig{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
+.hitblur{position:fixed;inset:0;z-index:149;pointer-events:none;background:rgba(110,0,0,.16);animation:hitblur 1.05s ease-out forwards}
+@keyframes hitblur{0%{backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0)}14%{backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}55%{backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}100%{backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0)}}
+.shk{animation:shk .65s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shk{10%,90%{transform:translate3d(-3px,1px,0)}20%,80%{transform:translate3d(7px,-3px,0)}30%,50%,70%{transform:translate3d(-12px,4px,0)}40%,60%{transform:translate3d(12px,-4px,0)}}
+@media (prefers-reduced-motion:reduce){.shk,.sil.miss,.who.turn,.ft.turn{animation:none}.hitblur{display:none}}
+
+/* ===== Pacote visual: atmosfera, metal/papel, medidores, lamparina ===== */
+:root{--f3:'Special Elite','Courier New',monospace;--f4:'Stardos Stencil',Impact,'Arial Black',sans-serif;--f5:'Caveat','Segoe Script',cursive}
+/* camadas de atmosfera */
+#fxl{position:fixed;inset:0;pointer-events:none;z-index:58;overflow:hidden}
+#fxl .vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+#fxl .grain{position:absolute;inset:-50%;opacity:.3;background-size:220px 220px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.5 0 0 0 -.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+body:not(.lite) #fxl .grain{animation:grainmv .9s steps(1) infinite}
+@keyframes grainmv{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-4%)}60%{transform:translate(-4%,-1%)}80%{transform:translate(3%,3%)}}
+#fxl .low{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at center,transparent 36%,rgba(150,0,0,.7) 100%)}
+body.lowhp #fxl .low{animation:lubdub 1.1s ease-in-out infinite}
+@keyframes lubdub{0%{opacity:.3}14%{opacity:1}28%{opacity:.45}42%{opacity:.9}70%{opacity:.3}100%{opacity:.3}}
+/* luz do jogador + paredes (tabletop) */
+.mlt{position:absolute;left:0;top:0;z-index:3;pointer-events:none}
+.mwalls,.mwtop{position:absolute;left:0;top:0;pointer-events:none;touch-action:none;overflow:visible}
+.mwalls{z-index:2}.mwtop{z-index:4}
+.mwl{stroke:#000;stroke-width:3.5;stroke-linecap:round}
+.mwhit{stroke:transparent;stroke-width:26;stroke-linecap:round;pointer-events:stroke;cursor:move}
+.mwsel{stroke:var(--acc);stroke-width:9;stroke-linecap:round;opacity:.45}
+.mwh{fill:var(--acc);stroke:transparent;stroke-width:24;pointer-events:all;cursor:grab}
+.mdhit{cursor:pointer}
+.mdc0{stroke:#24160a;stroke-width:9;stroke-linecap:butt}.mdc1{stroke:#b9803f;stroke-width:5;stroke-linecap:butt}
+.mdk{fill:#f0d9a8;stroke:#24160a;stroke-width:1}.mdp{fill:#1a110a;stroke:#d8b074;stroke-width:1.5}
+.mdo{stroke:#b9803f;stroke-width:3.5;stroke-linecap:round}.mda{fill:none;stroke:rgba(216,176,116,.5);stroke-width:1.5;stroke-dasharray:3 4}
+/* metal (lado terminal) */
+.card,.popc,.res{background-color:var(--sf);background-image:
+ radial-gradient(circle at 10px 10px,#8a989c 0 1.6px,#273236 2.2px,transparent 3px),
+ radial-gradient(circle at calc(100% - 10px) calc(100% - 10px),#8a989c 0 1.6px,#273236 2.2px,transparent 3px),
+ radial-gradient(ellipse 60% 40% at 15% 100%,rgba(0,0,0,.28),transparent 70%),
+ radial-gradient(ellipse 40% 30% at 92% 8%,rgba(120,70,20,.12),transparent 70%),
+ repeating-linear-gradient(92deg,rgba(255,255,255,.022) 0 1px,transparent 1px 5px),
+ linear-gradient(180deg,rgba(255,255,255,.04),transparent 30%)}
+.card{box-shadow:0 3px 8px rgba(0,0,0,.35)}
+/* papel (lado ficha) */
+.fside{padding-top:.9rem}
+.dossie,.fside .card,.pgw .panel,.pgw .report{position:relative;background-color:#2a2920;background-color:color-mix(in srgb,var(--sf) 76%,#4b4022);background-image:
+ radial-gradient(ellipse 45% 30% at 85% 12%,rgba(150,105,40,.22),transparent 70%),
+ radial-gradient(ellipse 35% 25% at 8% 92%,rgba(90,60,20,.26),transparent 70%),
+ radial-gradient(circle at 62% 70%,rgba(60,40,10,.18) 0 14px,transparent 15px),
+ repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 4px)}
+.fside .card{clip-path:none;box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.dossie{padding:.9rem 1rem 1rem;margin:.5rem 0 1rem;border:1px solid var(--rule);border-left:3px solid var(--acc);box-shadow:0 4px 12px rgba(0,0,0,.45)}
+.dossie::before,.dossie::after,.pgw .report::before{content:"";position:absolute;width:74px;height:22px;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(235,222,170,.36),rgba(210,195,140,.24));box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.dossie::before{top:-10px;left:14px;transform:rotate(-5deg)}
+.dossie::after{top:-10px;right:14px;transform:rotate(4deg)}
+.pgw .report::before{top:-11px;left:50%;margin-left:-37px;transform:rotate(-2deg)}
+.dh{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-bottom:.4rem}
+.dt{font:400 .95rem var(--f3);letter-spacing:.08em;text-transform:uppercase;color:var(--acc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stamp{flex:none;transform:rotate(-9deg);font:700 1.05rem/1 var(--f4);letter-spacing:.14em;text-transform:uppercase;padding:.25rem .55rem;border:3px double currentColor;border-radius:3px;opacity:.82;text-shadow:0 0 1px currentColor;pointer-events:none}
+.stamp.ok{color:#6fc99a}.stamp.inf{color:#ee8a3c}.stamp.dead{color:#e0553a}
+.hand{font:600 1.3rem/1.05 var(--f5);color:#eadfae;transform:rotate(-1.5deg);margin:.5rem .2rem .1rem;opacity:.93}
+.hand::before{content:"✎ ";opacity:.7}
+/* tipografia */
+h2,.pgw h2,.pgw h1.pg,.pgw .panel h3,.pgw .report h3,.pgw .syn h4,.card h3,.popc h2{font-family:var(--f3);font-weight:400;letter-spacing:.1em}
+#top nav::before{font-family:var(--f3)}
+/* navegação: painel de controle */
+#top nav>button{position:relative;margin:.35rem .12rem .3rem;padding:.5rem .8rem .5rem 1.45rem;font-size:.82rem;letter-spacing:.08em;background:linear-gradient(180deg,#1f2d33,#121b1e);border:1px solid #2c3b40;border-top-color:#41565e;border-bottom:3px solid #05090a;box-shadow:0 2px 0 #05090a,inset 0 1px 0 rgba(255,255,255,.07);color:var(--mu);transition:transform .06s,box-shadow .06s}
+#top nav>button::before{content:"";position:absolute;left:.6rem;top:50%;width:.5rem;height:.5rem;margin-top:-.25rem;border-radius:50%;background:#2a1a10;box-shadow:inset 0 0 2px #000}
+#top nav>button.on{background:linear-gradient(180deg,#0c1315,#162125);color:var(--acc);clip-path:none;border-bottom-width:1px;transform:translateY(2px);box-shadow:inset 0 3px 6px rgba(0,0,0,.75)}
+#top nav>button.on::before{background:var(--acc);box-shadow:0 0 6px var(--acc),0 0 12px var(--acc)}
+#top nav>button:active{transform:translateY(2px);box-shadow:inset 0 3px 6px rgba(0,0,0,.75)}
+body.panico #top nav>button.on{background:linear-gradient(180deg,#140808,#210f0e);color:var(--red)}
+#top nav>button.ltg{margin-left:auto;align-self:center;font-size:.75rem;padding:.4rem .8rem .4rem 1.5rem}
+#top nav>button.ltg::before{left:.55rem}
+#top nav>button.ltg.on::before{background:var(--grn);box-shadow:0 0 6px var(--grn),0 0 12px var(--grn)}
+@media (max-width:1380px){#top nav::before{display:none}#top nav{overflow-x:auto;scrollbar-width:none}}
+/* medidores analógicos */
+.gauges{display:flex;gap:.4rem;align-items:flex-end;justify-content:center;flex-wrap:nowrap;margin:.5rem 0}
+.gauge{flex:1.7 1 0;max-width:170px;min-width:0}.gauge.mini{flex:1 1 0;max-width:105px}
+.gauge svg{width:100%;height:auto;display:block;overflow:visible}
+.gauge .bz{fill:none;stroke:#0a1012;stroke-width:11}
+.gauge .zn{fill:none;stroke-width:5;opacity:.9}
+.gauge .tk{stroke:rgba(255,255,255,.4);stroke-width:1}
+.gauge .nd{transform-box:view-box;transform-origin:60px 62px;transform:rotate(var(--to));animation:ndl .9s cubic-bezier(.3,1.35,.5,1) both}
+.gauge .nt{transform-box:view-box;transform-origin:60px 62px}
+@keyframes ndl{from{transform:rotate(var(--from))}to{transform:rotate(var(--to))}}
+@keyframes ndshake{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.4deg)}}
+body.lowhp .gauge.life .nt{animation:ndshake .16s linear infinite}
+.gauge .nd line{stroke:#ece5d0;stroke-width:2.2;stroke-linecap:round}
+.gauge .hub{fill:#222c30;stroke:#9aa59d;stroke-width:1.2}
+.gauge .vl{font:700 15px var(--f2);fill:var(--ink);text-anchor:middle}
+.gauge .lb{font:600 8px var(--f2);fill:var(--mu);text-transform:uppercase;letter-spacing:.12em;text-anchor:middle}
+/* monitor cardíaco (só visual) */
+.mon{display:grid;grid-template-columns:1fr auto;gap:.6rem;align-items:center;background:#050d0b;border:1px solid var(--rule);padding:.3rem .6rem;margin:.5rem 0;box-shadow:inset 0 0 14px rgba(0,0,0,.8)}
+.mon .scr{height:34px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.mon svg{width:200%;height:100%;display:block;animation:ecgsc calc(60s / var(--bpm,72)) linear infinite}
+.mon path{fill:none;stroke:var(--grn);stroke-width:1.8;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+@keyframes ecgsc{to{transform:translateX(-25%)}}
+.mon.flat svg{animation:none}.mon.flat path{stroke:var(--red)}
+.mon .rd{text-align:right;line-height:1}
+.mon .bpm{display:block;font:700 1.5rem var(--f2);color:var(--grn);animation:bpmf calc(60s / var(--bpm,72)) ease-out infinite}
+.mon.flat .bpm{color:var(--red);animation:none}
+.mon small{font:.6rem var(--f2);letter-spacing:.15em;color:var(--mu)}
+@keyframes bpmf{0%{text-shadow:0 0 10px currentColor}45%{text-shadow:none}}
+/* ferimentos na silhueta */
+.bl{pointer-events:none}
+.bl .wet{fill:#a3121a}.bl .dry{fill:#4e0d11}
+.bl .drip{fill:none;stroke:#a3121a;stroke-width:2;stroke-linecap:round}
+.bl .pulse{animation:wpulse 1.4s ease-in-out infinite}
+@keyframes wpulse{50%{opacity:.45}}
+.bl .bd rect{fill:#d8d0b8;stroke:#8c846c;stroke-width:.7}
+.bl .bd .sx{stroke:#a69d84;stroke-width:.9}
+.bl .bd circle{fill:#b3161d;opacity:.8}
+/* vida baixa (< 45%): tremor, glitch e coração */
+@keyframes tremor{0%,86%,100%{transform:none}88%{transform:translate(-1.5px,.5px) rotate(-.12deg)}91%{transform:translate(1.8px,-.6px) rotate(.1deg)}94%{transform:translate(-1px,1px)}97%{transform:translate(.8px,-.4px)}}
+@keyframes glitch{0%,90%,100%{text-shadow:none;transform:none}91%{text-shadow:2px 0 rgba(255,40,40,.85),-2px 0 rgba(40,220,255,.6);transform:skewX(-6deg)}93%{text-shadow:-2px 0 rgba(255,40,40,.85),2px 0 rgba(40,220,255,.6);transform:skewX(4deg) translateX(2px)}95%{text-shadow:none;transform:none}}
+body.lowhp .card,body.lowhp .dossie,body.lowhp .bodymap{animation:tremor 5.5s infinite}
+body.lowhp h2,body.lowhp #top nav::before,body.lowhp .dt{animation:glitch 4.7s infinite}
+@media (prefers-reduced-motion:reduce){
+ body:not(.lite) #fxl .grain,body.lowhp .card,body.lowhp .dossie,body.lowhp .bodymap,body.lowhp h2,body.lowhp #top nav::before,body.lowhp .dt{animation:none}
+ body.lowhp #fxl .low{animation:none;opacity:.6}
+ .mon svg,.mon .bpm,.gauge .nd,.gauge .nt,.bl .pulse{animation:none}
+}
+/* tabletop em página inteira */
+.mbar{background:#090d0e;border-bottom:1px solid var(--rule)}
+.mrow{display:flex;flex-wrap:nowrap;gap:.4rem;align-items:center;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:.3rem .5rem}
+.mrow::-webkit-scrollbar{display:none}
+.mrow>*{flex:0 0 auto}.mrow button{padding:.35rem .65rem;font-size:.82rem}
+.mrow .mscl{display:flex;margin:0}
+#mscale{touch-action:none}
+.mbar .res{margin:.25rem .5rem;padding:.3rem .6rem}
+.mhelp{padding:0 .5rem .3rem;font-size:.8rem;color:var(--mu)}.mhelp summary{cursor:pointer}.mhelp .hint{white-space:normal}
+body.mesa-full{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+body.mesa-full #top{flex:0 0 auto}
+body.mesa-full main{flex:1 1 auto;min-height:0;width:100%;max-width:none;margin:0;padding:0;display:flex;flex-direction:column}
+body.mesa-full .mbar{flex:0 0 auto}
+body.mesa-full .mesa-wrap{flex:1 1 auto;min-height:0;max-height:none;width:100%;max-width:none;border:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+</style></head><body><div id="top"></div><main id="app"></main><div id="toast" class="toast"></div><script>
+const pct = L => 10 + 9 * L;
+const REGION_ORDER = ['Cabeça', 'Pescoço', 'Torso', 'Braços', 'Mãos', 'Pernas', 'Pés'];
+const REGIONS = {
+  'Cabeça': { dif: 0.5, grav: 1.5 }, 'Pescoço': { dif: 0.2, grav: 3.0 }, 'Torso': { dif: 1.0, grav: 1.0 },
+  'Braços': { dif: 0.8, grav: 0.8 }, 'Mãos': { dif: 0.4, grav: 0.6 }, 'Pernas': { dif: 0.8, grav: 0.8 }, 'Pés': { dif: 0.4, grav: 0.6 },
+};
+const FUNC = {
+  'Torso': { all: 20, text: '−20% em todas as ações físicas (dor)' },
+  'Braços': { attack: 30, text: '−30% em ataques com aquele braço; −50% em precisão com armas de fogo' },
+  'Pernas': { speed: 50, noRun: true, text: '−50% de velocidade; impossível correr' },
+  'Mãos': { attack: 40, text: 'Pode largar o que segura; −40% em ataques e precisão' },
+  'Pés': { speed: 60, text: 'Manca; −60% de velocidade; risco de queda' },
+  'Cabeça': { text: '−30% em Percepção; risco de concussão' },
+  'Pescoço': { all: 40, text: '−40% em todas as ações enquanto o ferimento estiver aberto' },
+};
+const ARMOR = [
+  { n: 'Boné ou chapéu', c: ['Cabeça'], b: 10 }, { n: 'Capacete de bicicleta', c: ['Cabeça'], b: 30 }, { n: 'Capacete', c: ['Cabeça'], b: 60 }, { n: 'Capacete militar', c: ['Cabeça'], b: 70 },
+  { n: 'Casaco grosso ou jaqueta jeans', c: ['Torso'], b: 20, p: 10 }, { n: 'Casaco de couro', c: ['Torso', 'Braços'], b: 40, p: 20 }, { n: 'Colete tático', c: ['Torso'], b: 50 }, { n: 'Colete balístico', c: ['Torso'], b: 60 },
+  { n: 'Braçadeiras improvisadas', c: ['Braços'], b: 25 }, { n: 'Cachecol', c: ['Pescoço'], b: 10 }, { n: 'Protetor de pescoço de hóquei', c: ['Pescoço'], b: 30 },
+  { n: 'Luvas de trabalho', c: ['Mãos'], b: 30 }, { n: 'Luvas de couro', c: ['Mãos'], b: 50 },
+  { n: 'Calça jeans', c: ['Pernas'], b: 10 }, { n: 'Calça reforçada', c: ['Pernas'], b: 30 }, { n: 'Calça de couro', c: ['Pernas'], b: 40 }, { n: 'Caneleiras improvisadas', c: ['Pernas'], b: 30 },
+  { n: 'Tênis', c: ['Pés'], b: 10 }, { n: 'Botas', c: ['Pés'], b: 40 }, { n: 'Botas militares', c: ['Pés'], b: 50 },
+];
+const REPERTOIRE = {
+  'Contundentes Curtos': ['Hematoma', 'Hematoma grave', 'Fratura'],
+  'Contundentes Longos': ['Hematoma', 'Fratura', 'Fratura exposta'],
+  'Lanças': ['Laceração', 'Ferida profunda', 'Ferida profunda grave'],
+  'Lâminas Curtas': ['Arranhão', 'Laceração', 'Ferida profunda'],
+  'Lâminas Longas': ['Laceração', 'Ferida profunda', 'Ferida profunda grave'],
+  'Machados': ['Laceração', 'Ferida profunda', 'Fratura + Ferida profunda'],
+};
+const QUALITIES = ['Raspão', 'Normal', 'Em cheio'];
+// bleed = % da vida por turno; pain = penalidade em %; inf = chance por dia
+const PROFILE = {
+  'Arranhão': { bleed: 0.5, pain: 0, cura: '2 dias', inf: '10%', tx: 'Curativo' },
+  'Laceração': { bleed: 2, pain: 5, cura: '5 a 7 dias', inf: '20%', tx: 'Curativo' },
+  'Ferida profunda': { bleed: 5, pain: 15, cura: '10 a 14 dias ou mais, mesmo costurada', inf: '35%', tx: 'Sutura (agulha e linha)' },
+  'Ferida profunda grave': { bleed: 8, pain: 25, cura: '14 a 21 dias', inf: '40%', tx: 'Sutura, bandagem e repouso' },
+  'Hematoma': { bleed: 0, pain: 5, cura: '3 dias', inf: '0', tx: 'Cura sozinho' },
+  'Hematoma grave': { bleed: 0, pain: 15, cura: '7 dias', inf: '0', tx: 'Repouso' },
+  'Fratura': { bleed: 0, pain: 25, cura: '30 a 40 dias, com tala e repouso', inf: '0', tx: 'Tala e repouso' },
+  'Fratura exposta': { bleed: 4, pain: 40, cura: '40 a 60 dias, com cirurgia', inf: '50%', tx: 'Cirurgia, ou sutura e tala' },
+  'Mordida': { bleed: 3, pain: 10, cura: 'Não cura (Infecção Knox)', inf: '—', tx: 'Nenhum a evita, só atrasa' },
+  'Estilhaço de vidro': { bleed: 1.5, pain: 5, cura: '3 dias após a remoção', inf: '40%', tx: 'Pinça ou fórceps' },
+  'Bala': { bleed: 4, pain: 20, cura: '14 a 21 dias após a remoção', inf: '40%', tx: 'Pinça ou fórceps' },
+  'Farpa': { bleed: 0.5, pain: 3, cura: '2 dias após a remoção', inf: '15%', tx: 'Como o estilhaço' },
+  'Queimadura': { bleed: 0, pain: 10, cura: '10 a 14 dias', inf: '30%', tx: 'Como laceração e arranhão' },
+  'Rigidez muscular': { bleed: 0, pain: 5, cura: '1 a 2 dias', inf: '0', tx: 'Passa sozinha' },
+};
+const WOUND_NAMES = Object.keys(PROFILE);
+// exceções por região. q = qualidade exigida (null = qualquer)
+const EXC = [
+  { r: 'Cabeça', w: ['Hematoma'], q: 'Normal', t: 'Atordoado: perde o próximo turno.', stun: true },
+  { r: 'Cabeça', w: ['Ferida profunda'], q: 'Normal', t: 'Sangue nos olhos: −20% em precisão.', pen: 20 },
+  { r: 'Cabeça', w: ['Fratura', 'Ferida profunda'], q: 'Em cheio', t: 'Morte imediata do alvo.', death: true },
+  { r: 'Cabeça', w: ['Bala'], q: null, t: 'Morte imediata do alvo.', death: true },
+  { r: 'Cabeça', w: ['Estilhaço de vidro', 'Farpa'], q: null, t: 'Sangue nos olhos: −20% em precisão enquanto alojado.', pen: 20 },
+  { r: 'Cabeça', w: ['Queimadura'], q: null, t: 'Vias aéreas e rosto: não corre e sofre −20% em precisão.', noRun: true, pen: 20 },
+  { r: 'Cabeça', w: ['Mordida'], q: null, t: 'A Infecção Knox leva 12 horas.', knox12: true },
+  { r: 'Pescoço', w: ['Ferida profunda'], q: null, t: 'Artéria: o sangramento só para com pressão direta contínua (teste de Primeiros Socorros).', artery: true },
+  { r: 'Pescoço', w: ['Hematoma'], q: 'Normal', t: 'Falta de ar: não consegue correr.', noRun: true },
+  { r: 'Pescoço', w: ['Fratura'], q: null, t: 'Pescoço quebrado: morte imediata do alvo.', death: true },
+  { r: 'Pescoço', w: ['Bala'], q: null, t: 'Artéria e traqueia: só para com pressão direta contínua, e o alvo morre sem tratamento imediato.', artery: true },
+  { r: 'Pescoço', w: ['Mordida'], q: null, t: 'Artéria: só para com pressão direta contínua, e a Infecção Knox leva 12 horas.', artery: true, knox12: true },
+  { r: 'Pescoço', w: ['Queimadura'], q: null, t: 'Vias aéreas: falta de ar, não consegue correr.', noRun: true },
+  { r: 'Torso', w: ['Fratura'], q: null, t: 'Costela quebrada: dor ao respirar, não consegue correr.', noRun: true },
+  { r: 'Torso', w: ['Hematoma'], q: 'Normal', t: 'Hemorragia interna lenta: 1% da vida por turno, sem sinal externo, até o tratamento.', extraBleed: 1 },
+  { r: 'Torso', w: ['Ferida profunda'], q: 'Em cheio', t: 'Pulmão ou órgão atingido: sangramento interno (exige cirurgia) e falta de ar (−30% nas ações).', internal: true, pen: 30 },
+  { r: 'Torso', w: ['Bala'], q: null, t: 'Pulmão ou órgão atingido: sangramento interno (exige cirurgia) e falta de ar (−30% nas ações).', internal: true, pen: 30 },
+  { r: 'Braços', w: ['Fratura'], q: null, t: 'Braço inutilizado: não ataca nem segura nada com ele até a tala.', noShield: true },
+  { r: 'Braços', w: ['Ferida profunda'], q: 'Em cheio', t: 'Tendão: braço inutilizado até a sutura.', noShield: true },
+  { r: 'Braços', w: ['Bala'], q: 'Em cheio', t: 'Osso atingido: causa também uma Fratura no braço.' },
+  { r: 'Mãos', w: ['Ferida profunda'], q: null, t: 'Tendão: larga o que segura e não segura nada com a mão até a sutura.' },
+  { r: 'Mãos', w: ['Fratura'], q: null, t: 'Mão inutilizada: não segura nada até a tala.' },
+  { r: 'Mãos', w: ['Estilhaço de vidro', 'Farpa'], q: null, t: 'Dor ao segurar: −20% em ataques com aquela mão enquanto alojado.', pen: 20 },
+  { r: 'Mãos', w: ['Bala'], q: 'Em cheio', t: 'Osso atingido: causa também uma Fratura na mão.' },
+  { r: 'Mãos', w: ['Mordida'], q: null, t: 'Larga o que segura.' },
+  { r: 'Mãos', w: ['Queimadura'], q: null, t: 'Mão queimada: −20% em ataques e precisão.', pen: 20 },
+  { r: 'Pernas', w: ['Ferida profunda'], q: 'Normal', t: 'Tendão: manca (−50% de velocidade) até a sutura.', speed: 50 },
+  { r: 'Pernas', w: ['Ferida profunda'], q: 'Em cheio', t: 'Não anda sem apoio: −80% de velocidade.', speed: 80 },
+  { r: 'Pernas', w: ['Fratura'], q: null, t: 'Não anda sem apoio: −80% de velocidade.', speed: 80 },
+  { r: 'Pernas', w: ['Bala'], q: 'Em cheio', t: 'Osso atingido: causa também uma Fratura na perna.' },
+  { r: 'Pés', w: ['Ferida profunda'], q: null, t: 'Manca: −60% de velocidade até a sutura.', speed: 60 },
+  { r: 'Pés', w: ['Fratura'], q: null, t: 'Não apoia o pé: −80% de velocidade e cai no primeiro movimento brusco.', speed: 80 },
+  { r: 'Pés', w: ['Estilhaço de vidro', 'Farpa'], q: null, t: 'Manca: −30% de velocidade enquanto alojado.', speed: 30 },
+  { r: 'Pés', w: ['Bala'], q: 'Em cheio', t: 'Osso atingido: causa também uma Fratura no pé.' },
+  { r: 'Pés', w: ['Queimadura'], q: null, t: 'Manca: −30% de velocidade.', speed: 30 },
+];
+const ZREGIONS = [[30, 'Torso'], [55, 'Braços'], [70, 'Pernas'], [80, 'Mãos'], [90, 'Pescoço'], [95, 'Pés'], [100, 'Cabeça']];
+const ZOMBIE_CHANCE = { 'Arranhão': 7, 'Laceração': 25, 'Mordida': 100 };
+const Z_QUALITY = { 'Arranhão': 'Raspão', 'Laceração': 'Normal', 'Mordida': 'Em cheio' };
+
+/* ===================== COMBATE ===================== */
+function blockPct(region, pieces) {
+  let s = 0; pieces.forEach(i => { const a = ARMOR[i]; if (region === 'Pescoço') s += a.c.includes('Pescoço') ? a.b : (a.p || 0); else if (a.c.includes(region)) s += a.b; });
+  return Math.min(80, s);
+}
+function hitChance(skillPct, region, block, pen) {
+  const raw = Math.floor(skillPct * REGIONS[region].dif * (1 - block / 100) * (1 - Math.min(0.8, pen)) + 1e-9);
+  return Math.min(95, Math.max(Math.max(1, Math.floor(5 * REGIONS[region].dif)), raw));
+}
+function qualityOf(folga, L) {
+  const lo = 1 / 3 - 0.015 * L, hi = 2 / 3 - 0.02 * L;
+  return folga < lo ? 'Raspão' : (folga >= hi ? 'Em cheio' : 'Normal');
+}
+function zombieRegion(roll) { for (const [m, r] of ZREGIONS) if (roll <= m) return r; return 'Cabeça'; }
+function zombieChance(block) { return Math.min(95, Math.max(5, 50 * (1 - block / 100))); }
+function zombieWound(folga) { return folga < 0.5 ? 'Arranhão' : (folga < 0.85 ? 'Laceração' : 'Mordida'); }
+
+function excFor(name, region, q) {
+  const bases = [];
+  if (name === 'Ferida profunda grave') { bases.push(['Ferida profunda', 'any']); }
+  else if (name === 'Fratura exposta') { bases.push(['Fratura', 'any']); bases.push(['Ferida profunda', 'Em cheio']); }
+  else if (name === 'Hematoma grave') { bases.push(['Hematoma', 'Normal']); }
+  else bases.push([name, q]);
+  const out = [];
+  EXC.forEach(e => {
+    if (e.r !== region) return;
+    bases.forEach(([bn, bq]) => {
+      if (!e.w.includes(bn)) return;
+      if (e.q === null || bq === 'any' || e.q === bq) { if (!out.includes(e)) out.push(e); }
+    });
+  });
+  return out;
+}
+let _wid = 0;
+function makeWound(name, region, q) {
+  const p = PROFILE[name], g = REGIONS[region].grav;
+  const ex = excFor(name, region, q);
+  let extra = 0, speed = 0, xpen = 0, flags = {};
+  ex.forEach(e => { extra += e.extraBleed || 0; xpen += e.pen || 0; speed = Math.max(speed, e.speed || 0); ['death', 'artery', 'internal', 'noRun', 'knox12', 'stun', 'noShield'].forEach(k => { if (e[k]) flags[k] = true; }); });
+  return { id: ++_wid + '-' + Date.now(), name, region, q, bleed: Math.max(p.bleed > 0 ? 1 : 0, Math.floor(p.bleed * g + extra + 1e-9)), pain: Math.floor(p.pain * g + 1e-9), xpen, notes: ex.map(e => e.t), flags, speed, treated: false };
+}
+
+/* Zumbi: não sangra nem sente dor. Morre por dano direto (% da vida dele) ou na hora com golpe sério EM CHEIO na cabeça ou no pescoço.
+   Dano = dano base do ferimento × gravidade da região × 2 se o zumbi estiver caído. */
+const MILD = ['Arranhão', 'Laceração', 'Hematoma'];
+const ZOMBIE_ATTACK = 50; // chance base de ataque do zumbi, em %
+const ZDMG = { 'Arranhão': 2, 'Laceração': 8, 'Hematoma': 5, 'Hematoma grave': 15, 'Ferida profunda': 25, 'Ferida profunda grave': 35, 'Fratura': 25, 'Fratura exposta': 35, 'Bala': 40, 'Estilhaço de vidro': 10, 'Farpa': 2, 'Queimadura': 10, 'Rigidez muscular': 0, 'Mordida': 0 };
+function zombieEffect(name, base, q, vulnerable) {
+  const serious = !MILD.includes(name);
+  const dmg = Math.max(1, Math.floor((ZDMG[name] || 0) * REGIONS[base].grav * (vulnerable ? 2 : 1) + 1e-9));
+  const r = { dmg, kill: false, stun: false, down: false, crawl: false, atk: 0, text: 'Cambaleia, sem efeito extra.' };
+  if (base === 'Cabeça') {
+    if (serious && q === 'Em cheio') { r.kill = true; r.text = 'Acerto em cheio na cabeça: o zumbi morre na hora.'; }
+    else if (serious) { r.text = 'Cabeça atingida com força: dano pesado, mas o zumbi segue de pé.'; }
+    else { r.stun = true; r.text = 'Atordoado: perde o próximo turno.'; }
+  } else if (base === 'Pescoço') {
+    if (serious && q === 'Em cheio') { r.kill = true; r.text = 'Acerto em cheio no pescoço: o zumbi morre na hora.'; }
+    else if (serious) { r.text = 'Pescoço atingido com força: dano pesado, mas o zumbi segue de pé.'; }
+  } else if (base === 'Torso') {
+    if (serious && q === 'Em cheio') { r.down = true; r.text = 'Derrubado: cai e fica vulnerável no próximo golpe.'; }
+  } else if (base === 'Braços') {
+    if (serious) { r.atk = 50; r.text = 'Braço ferido: o ataque do zumbi cai 50%.'; }
+  } else if (base === 'Mãos') {
+    if (serious) { r.atk = 25; r.text = 'Mão ferida: o ataque do zumbi cai 25%.'; }
+  } else if (base === 'Pernas' || base === 'Pés') {
+    if (serious) { r.crawl = true; r.text = 'Caído: o zumbi passa a engatinhar, fica vulnerável e ataca com metade da chance.'; }
+  }
+  return r;
+}
+function zombieAttackChance(z) { return ZOMBIE_ATTACK * (1 - Math.min(75, z.atk) / 100) * (z.crawl ? 0.5 : 1); }
+
+/* Regiões com lado (cada membro é separado). 'base' aponta para as regras do manual. */
+const REG11 = [
+  { id: 'Cabeça', base: 'Cabeça' }, { id: 'Pescoço', base: 'Pescoço' },
+  { id: 'Braço esquerdo', base: 'Braços' }, { id: 'Braço direito', base: 'Braços' },
+  { id: 'Mão esquerda', base: 'Mãos' }, { id: 'Mão direita', base: 'Mãos' },
+  { id: 'Perna esquerda', base: 'Pernas' }, { id: 'Perna direita', base: 'Pernas' },
+  { id: 'Pé esquerdo', base: 'Pés' }, { id: 'Pé direito', base: 'Pés' },
+  { id: 'Torso', base: 'Torso' },
+];
+const BASE_OF = {}; REG11.forEach(r => { BASE_OF[r.id] = r.base; });
+const blockValue = (id, v) => Math.max(0, Math.min(80, Math.round(+v || 0)));
+const ARM = 'M60 80 C52 81 45 87 43 97 C40 113 38 131 36 151 C35 162 34 174 33 190 L49 192 C51 172 54 160 57 148 C59 128 60 112 60 98 C60 90 60 84 60 80 Z';
+const HAND = 'M33 191 L49 193 C51 202 50 213 46 220 C43 225 36 224 34 218 C31 210 31 200 33 191 Z';
+const LEG = 'M66 192 L99 192 C99 220 97 246 95 272 C93 300 91 330 89 358 L77 358 C76 332 74 308 73 286 C70 260 65 224 66 192 Z';
+const FOOT = 'M76 359 L90 359 L91 376 C92 385 88 391 80 391 L62 391 C60 384 67 380 72 377 C74 372 75 365 76 359 Z';
+const BODY = [
+  { id: 'Cabeça', d: 'M100 6 C113 6 120 18 120 31 C120 45 112 55 100 55 C88 55 80 45 80 31 C80 18 87 6 100 6 Z', tx: 100, ty: 34 },
+  { id: 'Pescoço', d: 'M91 54 L109 54 L111 70 L89 70 Z', tx: 100, ty: 65 },
+  { id: 'Torso', d: 'M89 69 L111 69 C122 72 131 74 136 79 C140 83 141 90 140 98 L135 138 C133 152 135 172 136 192 L64 192 C65 172 67 152 65 138 L60 98 C59 90 60 83 64 79 C69 74 78 72 89 69 Z', tx: 100, ty: 132 },
+  { id: 'Braço direito', d: ARM, tx: 47, ty: 140 }, { id: 'Braço esquerdo', d: ARM, tx: 153, ty: 140, mirror: true },
+  { id: 'Mão direita', d: HAND, tx: 41, ty: 209 }, { id: 'Mão esquerda', d: HAND, tx: 159, ty: 209, mirror: true },
+  { id: 'Perna direita', d: LEG, tx: 84, ty: 277 }, { id: 'Perna esquerda', d: LEG, tx: 116, ty: 277, mirror: true },
+  { id: 'Pé direito', d: FOOT, tx: 76, ty: 379 }, { id: 'Pé esquerdo', d: FOOT, tx: 124, ty: 379, mirror: true },
+];
+function bodySvg(chances, sel, zom) {
+  const order = BODY.slice().sort((a, b) => (a.id === sel) - (b.id === sel));
+  let g = '', t = '';
+  order.forEach(s => {
+    const c = chances[s.id], op = (0.12 + c / 100 * 0.75).toFixed(2), col = c >= 60 ? '#4fae78' : c >= 35 ? '#d9a441' : '#e0624f';
+    const tf = s.mirror ? ' transform="translate(200 0) scale(-1 1)"' : (zom && s.id === 'Cabeça' ? ' transform="rotate(11 100 55)"' : '');
+    g += `<path d="${s.d}"${tf} class="rg${s.id === sel ? ' sel' : ''}" data-act="region" data-r="${esc(s.id)}" style="fill:${col};fill-opacity:${op}" tabindex="0" role="button" aria-label="${esc(s.id)}: ${Math.round(c)}% de chance"/>`;
+    t += `<text x="${s.tx}" y="${s.ty}" text-anchor="middle">${Math.round(c)}</text>`;
+  });
+  return `<svg class="bodymap${zom ? ' zombie' : ''}" viewBox="24 0 152 398" role="group" aria-label="${zom ? 'Silhueta de um zumbi' : 'Silhueta de um humano'}, vista de frente. Escolha a região que quer atacar.">${g}${t}<text class="side" x="30" y="10">Dir.</text><text class="side" x="170" y="10" text-anchor="end">Esq.</text></svg>`;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const n1 = n => (Math.round(n * 10) / 10).toLocaleString('pt-BR');
+const validRoll = v => { const n = parseInt(v, 10); return String(n) === String(v).trim() && n >= 1 && n <= 100 ? n : 0; };
+const $ = id => document.getElementById(id);
+const bar = (p, c) => `<i class="pb ${c || ''}"><b style="width:${Math.max(0, Math.min(100, p))}%"></b></i>`;
+const W = { 'Adaga': ['Lâminas Curtas', 6], 'Faca': ['Lâminas Curtas', 6], 'Machadinha': ['Machados', 9], 'Espada': ['Lâminas Longas', 11], 'Lança': ['Lanças', 11], 'Machado': ['Machados', 14], 'Martelo': ['Contundentes Curtos', 8], 'Clava longa': ['Contundentes Longos', 16], 'Forcado': ['Lanças', 11], 'Arpão': ['Lanças', 11], 'Foice': ['Lâminas Curtas', 6], 'Remo': ['Contundentes Longos', 16], 'Zumbi': ['—', 11] };
+const mkArm = o => { const a = {}; REG11.forEach(r => { if (o[r.base]) a[r.id] = o[r.base]; }); return a; };
+const PRE = { 'Medieval: gibão acolchoado': { Torso: 20, Braços: 20, Pescoço: 10, Pernas: 15, Pés: 20 }, 'Sem proteção': {}, 'Leve': { Torso: 5, Braços: 5, Pernas: 20, Pés: 10 }, 'Média': { Torso: 40, Braços: 40, Pernas: 20, Pés: 10, Pescoço: 20 }, 'Medieval: gibão e elmo de ferro': { Cabeça: 55, Torso: 40, Braços: 40, Pescoço: 20 }, 'Medieval: cota e elmo reforçado': { Cabeça: 65, Torso: 55, Braços: 55, Pescoço: 20 }, 'Pesada': { Torso: 40, Braços: 40, Pernas: 40, Pés: 65, Mãos: 30, Cabeça: 75, Pescoço: 20 } };
+const FN = { Cabeça: 0, Pescoço: 40, Torso: 20, Braços: 30, Mãos: 40, Pernas: 0, Pés: 0 };
+const BAR = { 'Cerca de estacas': [30, 6], 'Barricada de tábuas': [60, 5], 'Portão de madeira': [100, 3], 'Muralha de pedra': [300, 8] };
+const TRAT = {
+  'Arranhão': { m: 'Bandagem de linho', t: 10 }, 'Laceração': { m: 'Bandagem de linho', t: 15 },
+  'Mordida': { m: 'Bandagem de linho (só para o sangramento; a Infecção Knox não tem cura)', t: 15 }, 'Queimadura': { m: 'Bandagem de linho, com o fogo já apagado', t: 15 },
+  'Ferida profunda': { m: 'Agulha e linha (sutura) e bandagem', t: 30, ps: 1 }, 'Ferida profunda grave': { m: 'Agulha e linha (sutura) e bandagem', t: 40, ps: 1 },
+  'Estilhaço de vidro': { m: 'Pinça ou fórceps (mãos nuas: −20% no teste e +5 de dor) e bandagem', t: 20, ps: 1 }, 'Bala': { m: 'Pinça, fórceps ou agulha de sutura (−10% no teste) e bandagem', t: 25, ps: 1 },
+  'Farpa': { m: 'Pinça (mãos nuas: −20% no teste) e bandagem', t: 15, ps: 1 }, 'Fratura': { m: 'Tala (tábua e bandagem)', t: 30, ps: 1 }, 'Fratura exposta': { m: 'Sutura, tala e bandagem', t: 50, ps: 1 }
+};
+function reqsFor(w) {
+  const T = TRAT[w.name], R = [];
+  if (T) { R.push({ k: 'mat', t: 'Material: ' + T.m }, { k: 'tick', t: `Tempo gasto: ${T.t} ticks de quem trata` }); if (T.ps) R.push({ k: 'ps', t: 'Teste de Primeiros Socorros passou' + (T.m.startsWith('Pinça') || T.m.startsWith('Sutura') ? ' (remova o objeto antes do curativo)' : '') }); }
+  if (w.flags && w.flags.artery) R.push({ k: 'press', t: 'Pressão direta contínua aplicada (teste de Primeiros Socorros); quem pressiona não faz outra ação' });
+  if (w.flags && w.flags.internal) R.push({ k: 'cir', t: 'Cirurgia feita (exige médico e instrumentos)' });
+  return R;
+}
+function woundBlock(f, w) {
+  w.chk = w.chk || {}; const R = reqsFor(w), ok = R.every(r => w.chk[r.k]), I = `data-id="${f.id}" data-w="${w.id}"`;
+  const head = `<div class="whead"><span><b>${esc(w.name)}</b> em ${esc(w.side || w.region)}${w.treated ? ' <span class="tg y">em recuperação</span>' : ''}<small>${w.treated ? 'sangramento parado · ' : 'sangra ' + n1(w.bleed) + '% · '}dor −${n1(w.pain)}%${w.notes.length ? ' · ' + esc(w.notes.join(' ')) : ''}</small></span><button class="lnk" data-act="wheal" ${I}>apagar (lançado por engano)</button></div>`;
+  if (w.treated) return `<li class="wb">${head}<label class="ck"><input type="checkbox" data-wcure="1" ${I}> <b>Curado completamente</b> (a dor e a penalidade só somem aqui)</label><label class="ck"><input type="checkbox" data-wtr="1" ${I} checked> Tratado (desmarque para reabrir o ferimento)</label></li>`;
+  return `<li class="wb">${head}` + (R.length ? R.map(r => `<label class="ck"><input type="checkbox" data-wchk="${r.k}" ${I}${w.chk[r.k] ? ' checked' : ''}> ${esc(r.t)}</label>`).join('') : '<small>Sem tratamento imediato: só dor, cura sozinho.</small>') + `<label class="ck"><input type="checkbox" data-wtr="1" ${I}${ok ? '' : ' disabled'}> <b>Tratado</b>${ok ? '' : ' (conclua os requisitos acima)'}</label></li>`;
+}
+const KEY = 'zomboid-jogador-v2';
+let S, NEXT = 0;
+const fresh = () => ({ fs: [], next: 1, sel: { P: 0, E: 0 }, reg: { P: '', E: '' }, atk: 'P', log: [], hordas: [], hn: 1, tab: 'combate', sq: '', sqloc: '', sheets: [], sid: 1, auto: false, corpses: [], cn: 1, press: 1, clock: 0, turns: 0, hist: [] });
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } };
+function load() { try { const j = localStorage.getItem(KEY); S = Object.assign(fresh(), j ? JSON.parse(j) : {}); } catch (e) { S = fresh(); } S.auto = true; delete S.engol; if (!S.sheets.length && !S.fs.length) seed(); else if (!S.fs.length) { addF('P', 'humano'); addF('E', 'zumbi'); } fixState(); }
+function seed() {
+  const skills = {}; ['Lâminas Curtas', 'Lâminas Longas', 'Machados', 'Lanças', 'Contundentes Curtos', 'Contundentes Longos', 'Agilidade'].forEach(k => { skills[k] = 0; }); skills['Machados'] = 5;
+  const sh = { id: S.sid++, name: 'Godfrey', skills, arm: mkArm(PRE['Medieval: gibão acolchoado']), eq: { arma: 'Machadinha', escudo: 'Escudo de madeira' } };
+  S.sheets.push(sh);
+  const f = addF('P', 'humano'); f.sheet = sh.id; f.name = sh.name; f.weapon = 'Machadinha'; f.lvl = 5; f.arm = Object.assign({}, sh.arm); f.esc = 8;
+  addF('E', 'zumbi');
+}
+const fig = id => S.fs.find(f => f.id === +id);
+const cur = side => fig(S.sel[side]);
+function addF(side, kind) {
+  const z = kind === 'zumbi', n = S.fs.filter(f => f.side === side && f.kind === kind).length + 1;
+  const f = { id: S.next++, side, kind, name: (z ? 'Zumbi ' : side === 'P' ? 'Jogador ' : 'NPC ') + n, weapon: z ? 'Zumbi' : 'Machadinha', lvl: z ? 0 : 3, hp: 100, arm: {}, esc: 0, wounds: [], tick: curClock(), agi: 0, mord: 0, inf: 0, stun: false, fis: 0, mdado: '', frio: 0, cans: 0, abr: false, z: { down: false, crawl: false, atk: 0 }, knox: false, fo: 0, caido: false, seg: false };
+  S.fs.push(f); S.sel[side] = f.id; S.reg[side] = ''; return f;
+}
+const tier = v => v >= 75 ? 30 : v >= 50 ? 15 : v >= 25 ? 5 : 0;
+function penOf(f) { const seen = {}; let p = 0; f.wounds.forEach(w => { p += w.pain + (w.xpen || 0); if (!seen[w.region]) { seen[w.region] = 1; p += (FN[w.region] || 0) * (w.q === 'Raspão' ? 0.5 : 1); } }); return Math.min(80, Math.floor(p + tier(f.frio) + tier(f.cans) + (f.inf || 0))); }
+const bleedOf = f => f.wounds.filter(w => !w.treated).reduce((a, w) => a + w.bleed, 0);
+function cost(f) { const b = (W[f.weapon] || ['', 10])[1]; return Math.max(Math.ceil(b / 2), b - Math.floor(f.lvl / 2)); }
+function blockFor(T, id, sh) { let v = T.arm[id] || 0; if (sh && T.esc > 0 && ['Torso', 'Braços', 'Mãos'].includes(BASE_OF[id])) v += 30; return Math.min(80, v); }
+function chanceVs(A, T, id, sh) {
+  const b = blockFor(T, id, sh), m = manMult(A, T);
+  if (A.kind === 'zumbi') return Math.min(95, Math.max(5, Math.floor(zombieChance(b) * (1 - Math.min(75, A.z.atk) / 100) * (A.z.crawl ? 0.5 : 1) * pressureMult() * m + 1e-9)));
+  return Math.min(95, Math.max(1, Math.floor(hitChance(pct(A.lvl), BASE_OF[id], b, penOf(A) / 100) * m + 1e-9)));
+}
+let HT0 = 0;
+
+
+/* ===== atmosfera: sangue/ataduras, medidores, monitor, lamparina, clique ===== */
+function rng(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } let a = h >>> 0; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function woundArt(f, s, ws) {
+  const cid = 'cp' + f.id + '-' + BODY.indexOf(s), tf = s.mirror ? ' transform="translate(200 0) scale(-1 1)"' : '';
+  const defs = `<clipPath id="${cid}"><path d="${s.d}"${tf}/></clipPath>`;
+  const sp = /Torso/.test(s.id) ? [16, 30] : /Perna/.test(s.id) ? [8, 38] : /Braço/.test(s.id) ? [6, 28] : /Cabeça/.test(s.id) ? [12, 14] : [5, 8];
+  let o = '', bandage = false;
+  ws.forEach((w, i) => {
+    const gr = woundGrade(w), r = rng(f.id + '|' + s.id + '|' + i + '|' + (w.name || '') + '|' + (w.q || '')), big = gr === 3 && !w.treated;
+    const n = w.treated ? 2 : big ? 4 : 2, cls = w.treated ? 'dry' : 'wet';
+    for (let k = 0; k < n; k++) {
+      const x = s.tx + (r() * 2 - 1) * sp[0], y = s.ty + (r() * 2 - 1) * sp[1], rx = 2.5 + r() * (big ? 6 : 3.5), ry = rx * (0.7 + r() * 0.5), ro = Math.round(r() * 180);
+      o += `<ellipse class="${cls}${big && k === 0 ? ' pulse' : ''}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" transform="rotate(${ro} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+      if (big && k < 2) o += `<path class="drip" d="M${x.toFixed(1)} ${y.toFixed(1)} q1.5 8 0 ${(12 + r() * 14).toFixed(1)}"/>`;
+    }
+    if (w.treated) bandage = true;
+  });
+  if (bandage) {
+    const bw = /Torso/.test(s.id) ? 44 : 32, bh = /Torso/.test(s.id) ? 14 : 11, rot = -22 + (rng(f.id + s.id)() * 44 | 0);
+    o += `<g class="bd" transform="rotate(${rot} ${s.tx} ${s.ty})"><rect x="${s.tx - bw / 2}" y="${s.ty - bh / 2}" width="${bw}" height="${bh}" rx="2"/>`;
+    for (let k = -bw / 2 + 5; k < bw / 2 - 2; k += 6) o += `<line class="sx" x1="${s.tx + k}" y1="${s.ty - bh / 2 + 1}" x2="${s.tx + k}" y2="${s.ty + bh / 2 - 1}"/>`;
+    o += `<circle cx="${s.tx + 4}" cy="${s.ty}" r="2.4"/></g>`;
+  }
+  return { defs, ov: `<g clip-path="url(#${cid})">${o}</g>` };
+}
+const GP = {};
+function gauge(v, label, kind, key) {
+  v = Math.max(0, Math.min(100, +v || 0));
+  const rev = kind === 'mini', ang = p => -90 + 1.8 * p;
+  const pt = (p, r) => { const a = (180 - 1.8 * p) * Math.PI / 180; return [60 + r * Math.cos(a), 62 - r * Math.sin(a)]; };
+  const arc = (p0, p1, r) => { const a = pt(p0, r), b = pt(p1, r); return `M${a[0].toFixed(1)} ${a[1].toFixed(1)} A${r} ${r} 0 0 1 ${b[0].toFixed(1)} ${b[1].toFixed(1)}`; };
+  const cols = rev ? ['#4fae78', '#d9c441', '#e8883a', '#e0624f'] : ['#e0624f', '#e8883a', '#d9c441', '#4fae78'];
+  const cuts = rev ? [0, 25, 50, 75, 100] : [0, 25, 45, 75, 100];
+  let z = '', tk = '';
+  for (let i = 0; i < 4; i++) z += `<path class="zn" d="${arc(cuts[i], cuts[i + 1], 48)}" stroke="${cols[i]}"/>`;
+  for (let p = 0; p <= 100; p += 10) { const a = pt(p, p % 50 ? 40 : 37), b = pt(p, 43); tk += `<line class="tk" x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}"/>`; }
+  const to = ang(v), from = GP[key] === undefined ? -90 : GP[key]; GP[key] = to;
+  return `<div class="gauge ${kind}" role="img" aria-label="${label}: ${Math.round(v)}%"><svg viewBox="0 0 120 90"><path class="bz" d="${arc(0, 100, 48)}"/>${z}${tk}<g class="nd" style="--from:${from}deg;--to:${to}deg"><g class="nt"><line x1="60" y1="62" x2="60" y2="22"/></g></g><circle class="hub" cx="60" cy="62" r="4.5"/><text class="vl" x="60" y="78">${Math.round(v)}%</text><text class="lb" x="60" y="88">${label}</text></svg></div>`;
+}
+const BEAT = [[0, 20], [28, 20], [34, 20], [39, 14], [44, 20], [52, 20], [56, 24], [61, 3], [67, 37], [71, 20], [80, 20], [86, 15], [93, 20], [100, 20]];
+function monitor(f) {
+  const panic = PG.ui.estado === 'panico', dead = f.hp <= 0;
+  let b = dead ? 0 : (panic ? 116 : 72) + (f.hp < 45 ? 16 : 0) + Math.min(14, Math.round(bleedOf(f) * 3));
+  b = Math.min(b, 168);
+  let d = 'M0 20'; if (!dead) { d = ''; for (let k = 0; k < 4; k++) BEAT.forEach((p, i) => { d += (k === 0 && i === 0 ? 'M' : 'L') + (p[0] + 100 * k) + ' ' + p[1] + ' '; }); } else d = 'M0 20 L400 20';
+  return `<div class="mon${dead ? ' flat' : ''}" style="--bpm:${b || 60}" aria-hidden="true"><div class="scr"><svg viewBox="0 0 400 40" preserveAspectRatio="none"><path d="${d}"/></svg></div><div class="rd"><b class="bpm" data-b="${b}" data-j="${panic ? 8 : 3}">${b}</b><small>BPM</small></div></div>`;
+}
+function handNote(f) {
+  if (f.hp <= 0) return 'Não deu tempo…';
+  if (f.knox) return 'Mordida… ninguém pode saber.';
+  if (bleedOf(f) > 0) return 'Tá sangrando! Preciso de uma atadura.';
+  if (f.hp < 45) return 'Não aguento muito mais. Preciso descansar.';
+  if (penOf(f) > 0) return 'Dolorido, mas ainda de pé.';
+  return 'Tudo certo. Por enquanto.';
+}
+function pFig() { return S.tab === 'ficha' ? (S.fs.find(x => x.side === 'P' && x.sheet) || S.fs.find(x => x.side === 'P')) : cur('P'); }
+/* luz do jogador (com sombras de paredes) + paredes + camadas de atmosfera */
+const LITEKEY = 'pzrpg-lite';
+let LITE = true;
+try { if (localStorage.getItem(LITEKEY) === '0') LITE = false; } catch (e) { }
+const mWl = () => S.mesa.walls || (S.mesa.walls = []);
+/* desfazer (só ações do mapa; não é salvo) */
+function mSnapStr() { return JSON.stringify({ tk: S.mesa.tk, walls: S.mesa.walls || [], wn: S.mesa.wn || 0, st: S.mesa.st, sn: S.mesa.sn, im: S.mesa.im || null }); }
+function mPush(str) {
+  if (!str) return; const u = MZ.undo || (MZ.undo = []); if (u[u.length - 1] === str) return;
+  u.push(str); if (u.length > 40) u.shift();
+  const b = document.querySelector('[data-act="mundo"]'); if (b) b.disabled = false;
+}
+function mUndo() {
+  const u = MZ.undo || []; if (!u.length) return; const o = JSON.parse(u.pop());
+  S.mesa.tk = o.tk; S.mesa.walls = o.walls; S.mesa.wn = o.wn; if (o.st) S.mesa.st = o.st; if (o.sn !== undefined) S.mesa.sn = o.sn; S.mesa.im = o.im;
+  S.mesa.sel = 0; S.mesa.wsel = 0; save(); render(); msg('Última ação do mapa desfeita');
+}
+function mDoorG(w) {
+  const x1 = w.x1 * MS, y1 = w.y1 * MS, x2 = w.x2 * MS, y2 = w.y2 * MS, dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy) || 1;
+  let h = '';
+  if (w.open) { const ex = x1 - dy, ey = y1 + dx; h += `<path class="mda" d="M${x2} ${y2} A${L} ${L} 0 0 1 ${ex} ${ey}"/><line class="mdo" x1="${x1}" y1="${y1}" x2="${ex}" y2="${ey}"/>`; }
+  else h += `<line class="mdc0" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><line class="mdc1" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><circle class="mdk" cx="${x1 + dx * .82}" cy="${y1 + dy * .82}" r="2.6"/>`;
+  return h + `<circle class="mdp" cx="${x1}" cy="${y1}" r="3.6"/><circle class="mdp" cx="${x2}" cy="${y2}" r="3.6"/>`;
+}
+function mWalls() {
+  const lk = !!S.mesa.wlock; let h = '';
+  mWl().forEach(w => { const a = `data-wid="${w.id}" x1="${w.x1 * MS}" y1="${w.y1 * MS}" x2="${w.x2 * MS}" y2="${w.y2 * MS}"`; if (w.door) h += `<g class="mdg" data-dg="${w.id}">${mDoorG(w)}</g><line class="mwhit mdhit" ${a}/>`; else if (!lk) h += `<line class="mwl" ${a}/><line class="mwhit" ${a}/>`; });
+  return `<svg class="mwalls" width="${MC * MS}" height="${MR * MS}" aria-hidden="true">${h}</svg>`;
+}
+function mWallsTop() {
+  const w = mWl().find(x => x.id === S.mesa.wsel); let h = '';
+  if (w) {
+    h += `<line class="mwsel" x1="${w.x1 * MS}" y1="${w.y1 * MS}" x2="${w.x2 * MS}" y2="${w.y2 * MS}"/>`;
+    if (!S.mesa.wlock) h += `<circle class="mwh" data-wid="${w.id}" data-wh="1" cx="${w.x1 * MS}" cy="${w.y1 * MS}" r="5"/><circle class="mwh" data-wid="${w.id}" data-wh="2" cx="${w.x2 * MS}" cy="${w.y2 * MS}" r="5"/>`;
+  }
+  return `<svg class="mwtop" width="${MC * MS}" height="${MR * MS}" aria-hidden="true">${h}</svg>`;
+}
+function mWallAct() {
+  const w = mWl().find(x => x.id === S.mesa.wsel); if (!w || S.mesa.wlock) return '';
+  const x = (w.x1 + w.x2) / 2 * MS, y = Math.max(2, Math.min(w.y1, w.y2) * MS - 44);
+  if (w.door) return `<div class="mact" style="left:${x}px;top:${y}px"><button class="go" data-act="mdtog" data-id="${w.id}">${w.open ? 'Fechar' : 'Abrir'} porta</button><button data-act="mwdel" data-id="${w.id}" title="Apagar porta">✕ Porta</button></div>`;
+  return `<div class="mact" style="left:${x}px;top:${y}px"><button data-act="mwdel" data-id="${w.id}" title="Apagar parede">✕ Parede</button></div>`;
+}
+/* visibilidade: varre os raios a partir da luz e para na parede mais próxima */
+function visPoly(lx, ly, R, segs) {
+  const h = R * 1.12, x0 = lx - h, y0 = ly - h, x1 = lx + h, y1 = ly + h;
+  const all = segs.concat([[x0, y0, x1, y0], [x1, y0, x1, y1], [x1, y1, x0, y1], [x0, y1, x0, y0]]), ang = [];
+  all.forEach(s => { [[s[0], s[1]], [s[2], s[3]]].forEach(p => { const a = Math.atan2(p[1] - ly, p[0] - lx); ang.push(a - 1e-4, a, a + 1e-4); }); });
+  const pts = [];
+  ang.forEach(a => {
+    const dx = Math.cos(a), dy = Math.sin(a); let best = Infinity;
+    all.forEach(s => {
+      const ex = s[2] - s[0], ey = s[3] - s[1], den = dx * ey - dy * ex; if (Math.abs(den) < 1e-9) return;
+      const wx = s[0] - lx, wy = s[1] - ly, t = (wx * ey - wy * ex) / den, u = (wx * dy - wy * dx) / den;
+      if (t > 0 && u >= 0 && u <= 1 && t < best) best = t;
+    });
+    if (best < Infinity) pts.push([a, lx + dx * best, ly + dy * best]);
+  });
+  pts.sort((p, q) => p[0] - q[0]); return pts;
+}
+function mLightBuild() {
+  if (!MZ.cv) return;
+  const lamps = [...document.querySelectorAll('#mboard .mtk[data-lamp]')].filter(e => +e.dataset.lamp > 0 && !e.classList.contains('dead')).map(e => ({ x: e.offsetLeft + e.offsetWidth / 2, y: e.offsetTop + 19, R: Math.round(e.dataset.lamp === '3' ? MS * .95 : MS * 5.2 * (e.dataset.lamp === '2' ? .75 : 1)), off: e.dataset.lamp === '3' }));
+  const wl0 = mWl(), q = w => [w.x1 * MS, w.y1 * MS, w.x2 * MS, w.y2 * MS], segs = wl0.filter(w => !(w.door && w.open)).map(q), old = MZ.lamps || []; MZ.segs = wl0.filter(w => !w.door).map(q); MZ.drs = wl0.filter(w => w.door).map(w => ({ s: q(w), o: !!w.open }));
+  MZ.lamps = lamps.map((L, i) => {
+    const size = Math.ceil(L.R * 2.4), o = size / 2, m = document.createElement('canvas'); m.width = m.height = size;
+    const c = m.getContext('2d'); c.fillStyle = '#fff'; c.globalAlpha = .3;
+    [[0, 0], [6, 0], [-6, 0], [0, 6], [0, -6], [4, 4], [-4, 4], [4, -4], [-4, -4]].forEach(j => {
+      const p = visPoly(L.x + j[0], L.y + j[1], L.R, segs); if (!p.length) return; c.beginPath();
+      p.forEach((q, k) => { const X = q[1] - L.x + o, Y = q[2] - L.y + o; if (k) c.lineTo(X, Y); else c.moveTo(X, Y); }); c.closePath(); c.fill();
+    });
+    const dust = (old[i] && old[i].dust) || Array.from({ length: 14 }, () => ({ a: Math.random() * 6.283, d: .1 + Math.random() * .75, va: (Math.random() - .5) * .004, vd: (Math.random() - .5) * .002, r: .7 + Math.random() * 1.3, ph: Math.random() * 6.28 }));
+    let mk = m;
+    try { const b = document.createElement('canvas'); b.width = b.height = size; const bc = b.getContext('2d'); bc.filter = 'blur(5px)'; bc.drawImage(m, 0, 0); mk = b; } catch (e) { mk = m; }
+    return { x: L.x, y: L.y, R: L.R, mask: mk, o, dust, off: L.off };
+  });
+}
+function mLightDraw(t) {
+  const cv = MZ.cv; if (!cv || !document.body.contains(cv)) return false;
+  const c = cv.getContext('2d'), L = MZ.lamps || [], b = document.body.classList, panic = b.contains('panico'), low = b.contains('lowhp');
+  c.globalCompositeOperation = 'source-over'; c.clearRect(0, 0, cv.width, cv.height);
+  if (!L.length) return true;
+  c.fillStyle = 'rgba(1,3,4,.93)'; c.fillRect(0, 0, cv.width, cv.height);
+  let fl = 1, jx = 0, jy = 0, ga = 1;
+  if (MZ.loop) {
+    const pn = panic ? 1 : 0;
+    if (Math.random() < (low ? .06 : panic ? .03 : .005)) MZ.kick = .15 + Math.random() * .25; MZ.kick = (MZ.kick || 0) * .78;
+    fl = 1 + (.035 + .03 * pn) * Math.sin(t / (180 - 50 * pn)) + (.025 + .02 * pn) * Math.sin(t / 73 + 1.3) + .02 * Math.sin(t / 410) - MZ.kick;
+    if (pn) { jx = Math.sin(t / 31) * .9 + (Math.random() - .5) * 1.4; jy = Math.cos(t / 37) * .9 + (Math.random() - .5) * 1.4; ga = 1 + .18 * Math.sin(t / 210); }
+  }
+  const tmp = MZ.tmp || (MZ.tmp = document.createElement('canvas')), col = '255,176,80';
+  L.forEach(l => {
+    const s = l.mask.width; if (tmp.width !== s) tmp.width = tmp.height = s; const x = tmp.getContext('2d'), lf = l.off ? 1 : fl;
+    x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, s, s);
+    const g = x.createRadialGradient(l.o, l.o, 0, l.o, l.o, l.R * lf * 1.05);
+    g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(.285, 'rgba(0,0,0,1)'); for (let i = 1; i < 10; i++) { const u = i / 10, a = 1 - u * u * (3 - 2 * u); g.addColorStop(.285 + .715 * u, `rgba(0,0,0,${a.toFixed(3)})`); } g.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = g; x.fillRect(0, 0, s, s); x.globalCompositeOperation = 'destination-in'; x.drawImage(l.mask, 0, 0);
+    c.globalCompositeOperation = 'destination-out'; c.drawImage(tmp, l.x - l.o + (l.off ? 0 : jx), l.y - l.o + (l.off ? 0 : jy));
+  });
+  L.forEach(l => {
+    const s = l.mask.width; if (tmp.width !== s) tmp.width = tmp.height = s; const x = tmp.getContext('2d'), R = l.R * (l.off ? 1 : fl), A = l.off ? .4 : ga;
+    x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, s, s);
+    const g = x.createRadialGradient(l.o, l.o, 0, l.o, l.o, R * 1.02);
+    g.addColorStop(0, `rgba(${col},${(.36 * A).toFixed(3)})`); g.addColorStop(.555, `rgba(${col},${(.15 * A).toFixed(3)})`); g.addColorStop(.86, `rgba(${col},${(.04 * A).toFixed(3)})`); g.addColorStop(1, `rgba(${col},0)`);
+    x.fillStyle = g; x.fillRect(0, 0, s, s);
+    if (MZ.loop && !LITE && !l.off) l.dust.forEach(p => {
+      p.a += p.va; p.d += p.vd; if (p.d < .08 || p.d > .85) p.vd = -p.vd;
+      const al = (1 - p.d) * .6 * (.6 + .4 * Math.sin(p.ph + t / 900)); x.fillStyle = `rgba(255,228,170,${al.toFixed(2)})`; x.beginPath(); x.arc(l.o + Math.cos(p.a) * p.d * R, l.o + Math.sin(p.a) * p.d * R, p.r, 0, 6.283); x.fill();
+    });
+    x.globalCompositeOperation = 'destination-in'; x.drawImage(l.mask, 0, 0);
+    c.globalCompositeOperation = 'source-over'; c.drawImage(tmp, l.x - l.o + (l.off ? 0 : jx), l.y - l.o + (l.off ? 0 : jy));
+  });
+  /* paredes visíveis por cima da escuridão só enquanto desbloqueadas */
+  const sg = MZ.segs || [];
+  if (sg.length && !S.mesa.wlock) {
+    c.globalCompositeOperation = 'source-over'; c.lineCap = 'round';
+    c.beginPath(); sg.forEach(q => { c.moveTo(q[0], q[1]); c.lineTo(q[2], q[3]); });
+    c.strokeStyle = 'rgba(0,0,0,.85)'; c.lineWidth = 6; c.stroke();
+    c.strokeStyle = 'rgba(190,176,150,.8)'; c.lineWidth = 2.5; c.stroke();
+  }
+  const dr = MZ.drs || [];
+  if (dr.length && !S.mesa.wlock) {
+    c.globalCompositeOperation = 'source-over'; c.lineCap = 'round';
+    dr.forEach(d => { c.beginPath(); c.moveTo(d.s[0], d.s[1]); c.lineTo(d.s[2], d.s[3]); if (!d.o) { c.setLineDash([]); c.strokeStyle = 'rgba(0,0,0,.85)'; c.lineWidth = 7; c.stroke(); } c.setLineDash(d.o ? [4, 5] : []); c.strokeStyle = d.o ? 'rgba(216,176,116,.6)' : 'rgba(205,140,60,.95)'; c.lineWidth = 3; c.stroke(); });
+    c.setLineDash([]);
+  }
+  return true;
+}
+function mLightLoop(t) {
+  MZ.raf = requestAnimationFrame(mLightLoop);
+  if (t - (MZ.last || 0) < 33) return; MZ.last = t;
+  if (!mLightDraw(t)) { cancelAnimationFrame(MZ.raf); MZ.raf = 0; }
+}
+function mLightInit() {
+  cancelAnimationFrame(MZ.raf); MZ.raf = 0; MZ.cv = document.getElementById('mlight'); if (!MZ.cv) return;
+  mLightBuild(); MZ.loop = !reduceMotion() && (!LITE || document.body.classList.contains('panico'));
+  if (MZ.loop) MZ.raf = requestAnimationFrame(mLightLoop); else mLightDraw(0);
+}
+function mLightUpdate() {
+  if (!MZ.cv || MZ.pend) return; MZ.pend = 1;
+  requestAnimationFrame(() => { MZ.pend = 0; mLightBuild(); if (!MZ.loop) mLightDraw(0); });
+}
+const reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+/* paredes: arrastar, esticar pelas pontas, girar/esticar com dois dedos */
+let WD = null, DT = null; const WP = new Map();
+function wallEvents() {
+  const board = () => document.getElementById('mboard');
+  const bp = e => { const bd = board(), r = bd.getBoundingClientRect(), k = r.width / bd.offsetWidth || 1; return [(e.clientX - r.left) / k, (e.clientY - r.top) / k]; };
+  const Wd = MC * MS, Hd = MR * MS;
+  const cl = p => [Math.max(0, Math.min(Wd, p[0])), Math.max(0, Math.min(Hd, p[1]))];
+  const sn = v => v;
+  const wl = id => mWl().find(w => w.id === +id);
+  const put = (w, a, b) => { w.x1 = a[0] / MS; w.y1 = a[1] / MS; w.x2 = b[0] / MS; w.y2 = b[1] / MS; };
+  const paint = w => {
+    const bd = board(); if (!bd) return;
+    bd.querySelectorAll(`line[data-wid="${w.id}"]`).forEach(l => { l.setAttribute('x1', w.x1 * MS); l.setAttribute('y1', w.y1 * MS); l.setAttribute('x2', w.x2 * MS); l.setAttribute('y2', w.y2 * MS); });
+    bd.querySelectorAll(`.mwh[data-wid="${w.id}"]`).forEach(c => { const k = c.dataset.wh === '1'; c.setAttribute('cx', (k ? w.x1 : w.x2) * MS); c.setAttribute('cy', (k ? w.y1 : w.y2) * MS); });
+    if (w.door) { const g = bd.querySelector(`.mdg[data-dg="${w.id}"]`); if (g) g.innerHTML = mDoorG(w); }
+    const sel = bd.querySelector('.mwsel'); if (sel && S.mesa.wsel === w.id) { sel.setAttribute('x1', w.x1 * MS); sel.setAttribute('y1', w.y1 * MS); sel.setAttribute('x2', w.x2 * MS); sel.setAttribute('y2', w.y2 * MS); }
+    const m = bd.querySelector('.mact'); if (m) m.remove();
+  };
+  function startPinch() {
+    const ps = [...WP.values()], w = wl(WD.id); if (!w || ps.length < 2 || S.mesa.wsel !== WD.id) return;
+    const a = ps[0], b = ps[1];
+    WD.pinch = { d0: Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, ang0: Math.atan2(b[1] - a[1], b[0] - a[0]), m0: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], o: [w.x1 * MS, w.y1 * MS, w.x2 * MS, w.y2 * MS] }; WD.moved = true;
+  }
+  document.addEventListener('pointerdown', e => {
+    if (S.tab !== 'mesa' || !board() || e.button > 0) return;
+    if (board().contains(e.target)) WP.set(e.pointerId, bp(e));
+    if (S.mesa.wlock && !MZ.place) { const dh = e.target.closest && e.target.closest('.mdhit'); if (dh) { DT = { id: +dh.dataset.wid, pid: e.pointerId, p0: bp(e) }; e.preventDefault(); } }
+    if (S.mesa.wlock || MZ.place) return;
+    if (WD) { if (WP.size >= 2 && !WD.pinch) startPinch(); return; }
+    const h = e.target.closest && e.target.closest('.mwh'), ln = e.target.closest && e.target.closest('.mwhit'), el = h || ln; if (!el) return;
+    const w = wl(el.dataset.wid); if (!w) return;
+    WD = { id: w.id, mode: h ? 'h' + el.dataset.wh : (S.mesa.wsel === w.id ? 'move' : 'tap'), snap: mSnapStr(), pid: e.pointerId, p0: bp(e), o: [w.x1 * MS, w.y1 * MS, w.x2 * MS, w.y2 * MS], moved: false, pinch: null, wasSel: S.mesa.wsel === w.id };
+    e.preventDefault();
+  });
+  document.addEventListener('pointermove', e => {
+    if (!WD || !board()) return; if (WP.has(e.pointerId)) WP.set(e.pointerId, bp(e));
+    const w = wl(WD.id); if (!w) return;
+    if (WD.pinch) {
+      if (WP.size < 2) return;
+      const ps = [...WP.values()], a = ps[0], b = ps[1], P = WD.pinch, d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, sc = Math.max(.15, d / P.d0), rot = Math.atan2(b[1] - a[1], b[0] - a[0]) - P.ang0;
+      const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], o = P.o, c0 = [(o[0] + o[2]) / 2, (o[1] + o[3]) / 2], vx = (o[2] - o[0]) * sc, vy = (o[3] - o[1]) * sc, cr = Math.cos(rot), sr = Math.sin(rot);
+      let rx = vx * cr - vy * sr, ry = vx * sr + vy * cr; const len = Math.hypot(rx, ry) || 1, k = len < 12 ? 12 / len : 1; rx *= k; ry *= k;
+      const c = [c0[0] + m[0] - P.m0[0], c0[1] + m[1] - P.m0[1]];
+      put(w, cl([c[0] - rx / 2, c[1] - ry / 2]), cl([c[0] + rx / 2, c[1] + ry / 2]));
+    } else {
+      if (e.pointerId !== WD.pid) return;
+      if (WD.mode === 'tap') return;
+      const p = bp(e), dx = p[0] - WD.p0[0], dy = p[1] - WD.p0[1];
+      if (!WD.moved && Math.hypot(dx, dy) < 5) return; WD.moved = true; const o = WD.o;
+      if (WD.mode === 'move') {
+        const ddx = Math.max(-Math.min(o[0], o[2]), Math.min(Wd - Math.max(o[0], o[2]), dx)), ddy = Math.max(-Math.min(o[1], o[3]), Math.min(Hd - Math.max(o[1], o[3]), dy));
+        put(w, [o[0] + ddx, o[1] + ddy], [o[2] + ddx, o[3] + ddy]);
+      } else if (WD.mode === 'h1') put(w, cl([sn(o[0] + dx), sn(o[1] + dy)]), [o[2], o[3]]);
+      else put(w, [o[0], o[1]], cl([sn(o[2] + dx), sn(o[3] + dy)]));
+    }
+    paint(w); mLightUpdate();
+  });
+  const endW = (e, cancel) => {
+    WP.delete(e.pointerId);
+    if (DT && e.pointerId === DT.pid) { const d = DT; DT = null; const bd = board(); if (!cancel && bd) { const r = bd.getBoundingClientRect(), k = r.width / bd.offsetWidth || 1, dx = (e.clientX - r.left) / k - d.p0[0], dy = (e.clientY - r.top) / k - d.p0[1]; if (Math.hypot(dx, dy) < 8) { const w = wl(d.id); if (w) { mPush(mSnapStr()); w.open = w.open ? 0 : 1; render(); } } } return; }
+    if (!WD) return;
+    if (WD.pinch) { if (WP.size >= 2) return; } else if (e.pointerId !== WD.pid) return;
+    const d = WD; WD = null; WP.clear();
+    const dw = wl(d.id);
+    if (d.moved) { mPush(d.snap); save(); S.mesa.wsel = d.id; }
+    else if (dw && dw.door && !cancel && (d.mode === 'tap' || d.mode === 'move')) { mPush(d.snap); dw.open = dw.open ? 0 : 1; save(); S.mesa.wsel = d.id; }
+    else S.mesa.wsel = (d.wasSel && !cancel) ? 0 : d.id;
+    S.mesa.sel = 0; render();
+  };
+  document.addEventListener('keydown', e => { if (S.tab === 'mesa' && (e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z') && !/INPUT|SELECT|TEXTAREA/.test((e.target && e.target.tagName) || '')) { e.preventDefault(); mUndo(); } });
+  document.addEventListener('pointerup', e => endW(e, false));
+  document.addEventListener('pointercancel', e => endW(e, true));
+}
+function setLite(v, quiet) {
+  LITE = !!v; try { localStorage.setItem(LITEKEY, LITE ? '1' : '0'); } catch (e) { }
+  document.body.classList.toggle('lite', LITE);
+  document.querySelectorAll('[data-act="lite"]').forEach(b => { b.classList.toggle('on', LITE); b.setAttribute('aria-pressed', LITE); });
+  if (typeof MZ !== 'undefined' && MZ.cv) mLightInit();
+  if (!quiet) msg(LITE ? 'Modo leve ligado' : 'Modo leve desligado: luz do jogador completa');
+}
+let FXREADY = false;
+function fxInit() {
+  if (FXREADY || typeof document === 'undefined') return; FXREADY = true;
+  const l = document.createElement('div'); l.id = 'fxl'; l.setAttribute('aria-hidden', 'true'); l.innerHTML = '<div class="vig"></div><div class="grain"></div><div class="low"></div>';
+  document.body.append(l);
+  setInterval(() => { document.querySelectorAll('.bpm').forEach(e => { const b = +e.dataset.b, j = +e.dataset.j; if (b) e.textContent = Math.max(30, b + Math.round((Math.random() * 2 - 1) * j)); }); }, 1100);
+  setLite(LITE, true);
+}
+function clickSfx() {
+  try {
+    if (!audio()) return; const t = AC.currentTime + 0.005;
+    [[0, 1], [0.075, 0.45]].forEach(([dt, k]) => {
+      thump(t + dt, 190, 0.45 * k, 0.05);
+      const src = AC.createBufferSource(), f = AC.createBiquadFilter(), a = AC.createGain();
+      src.buffer = nzBuf(0.04); f.type = 'bandpass'; f.frequency.value = 3200; f.Q.value = 2;
+      a.gain.setValueAtTime(0.0001, t + dt); a.gain.linearRampToValueAtTime(0.22 * k, t + dt + 0.003); a.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.035);
+      src.connect(f); f.connect(a); a.connect(AC.destination); src.start(t + dt); src.stop(t + dt + 0.05);
+    });
+  } catch (e) { }
+}
+
+/* ---------- silhueta de ferimentos (aba Ficha) ---------- */
+const WCOL = ['#8fa597', '#d9c441', '#e8883a', '#e0624f'];
+const woundGrade = w => w.treated ? 1 : ((w.bleed >= 4 || w.pain >= 25 || w.flags.death || w.flags.artery || w.flags.internal) ? 3 : 2);
+const woundsAt = (f, id) => f.wounds.filter(w => w.side ? w.side === id : w.region === BASE_OF[id]);
+function bodyStatus(f) {
+  let g = '', t = '', ov = '', defs = '';
+  BODY.forEach(s => {
+    const ws = woundsAt(f, s.id), c = WCOL[Math.max(0, ...ws.map(woundGrade))], tf = s.mirror ? ' transform="translate(200 0) scale(-1 1)"' : '';
+    g += `<path d="${s.d}"${tf} class="rg" data-act="wpop" data-id="${f.id}" data-r="${esc(s.id)}" style="fill:${c};fill-opacity:1" tabindex="0" role="button" aria-label="${esc(s.id)}: ${ws.length} ferimento(s)"/>`;
+    if (ws.length) { const o = woundArt(f, s, ws); ov += o.ov; defs += o.defs; }
+    if (ws.length) t += `<text x="${s.tx}" y="${s.ty}">${ws.length}</text>`;
+  });
+  return `<svg class="bodymap" viewBox="24 0 152 398" role="group" aria-label="Seus ferimentos, vista de frente"><defs>${defs}</defs>${g}<g class="bl">${ov}</g>${t}<text class="side" x="30" y="10">Dir.</text><text class="side" x="170" y="10" text-anchor="end">Esq.</text></svg>`;
+}
+function statusBlock(f) {
+  const st = f.hp <= 0 ? ['Falecido', 'dead'] : f.knox ? ['Infectado', 'inf'] : f.hp < 45 ? ['Crítico', 'inf'] : ['Vivo', 'ok'];
+  return `<div class="dossie"><div class="dh"><span class="dt">Prontuário · ${esc(f.name)}</span><span class="stamp ${st[1]}">${st[0]}</span></div><div class="sil">${bodyStatus(f)}</div><div class="row" style="justify-content:center"><span class="tg r">grave aberto</span><span class="tg" style="color:#e8883a">leve aberto</span><span class="tg" style="color:#d9c441">em recuperação</span></div><div class="gauges">${gauge(f.hp, 'Vida', 'life', 'l' + f.id)}${gauge(f.frio || 0, 'Frio', 'mini', 'f' + f.id)}${gauge(f.cans || 0, 'Cansaço', 'mini', 'c' + f.id)}</div>${monitor(f)}<p class="hint">Vida ${Math.round(f.hp)}% · penalidade −${n1(penOf(f))}% · sangra ${n1(bleedOf(f))}%/turno · ${f.wounds.length} ferimento(s). Toque numa região para ver a lista.</p><div class="hand">${handNote(f)}</div></div>`;
+}
+function popup() {
+  const f = S.pop && fig(S.popf); if (!f) return '';
+  const ws = woundsAt(f, S.pop);
+  return `<div class="pop"><div class="popbg" data-act="wclose"></div><div class="popc"><h2>${esc(S.pop)}</h2>${ws.length ? '<ul class="wl">' + ws.map(w => woundBlock(f, w)).join('') + '</ul>' : '<p class="hint">Sem ferimentos nesta região.</p>'}<button class="go" data-act="wclose">Fechar</button></div></div>`;
+}
+let HID = '';
+function hurt(T, name, base, q, from) {
+  const w = makeWound(name, base, q); w.nb = HT0 + 10; w.side = HID; const d0 = Math.max(1, w.bleed); T.wounds.push(w); T.hp = Math.max(0, T.hp - d0); let t = `${name} em ${w.side || base} (dano inicial −${d0}%, sangra ${n1(w.bleed)}%/turno, dor −${n1(w.pain)}%)`;
+  if (w.flags.death) { T.hp = 0; t += ' — MORTE IMEDIATA'; }
+  if (w.flags.stun) { T.stun = true; if (S.auto) { T.tick += 10; t += ' — atordoado (+10 ticks)'; } else t += ' — atordoado (sugestão: +10 ticks)'; }
+  if (name === 'Mordida') { T.knox = true; t += ` — Infecção Knox (${w.flags.knox12 ? '12 h' : '24 a 48 h'})`; }
+  else if (from === 'zumbi' && ZOMBIE_CHANCE[name]) t += ` — zumbificação: d100 ≤ ${ZOMBIE_CHANCE[name]}`;
+  if (w.notes.length) t += ' [' + w.notes.join(' ') + ']';
+  return t;
+}
+function zhurt(T, name, base, q) {
+  const r = zombieEffect(name, base, q, T.z.down || T.z.crawl), was = T.z.down;
+  T.hp = Math.max(0, T.hp - r.dmg); if (r.kill) T.hp = 0;
+  if (was && !r.down) T.z.down = false;
+  if (r.down) T.z.down = true;
+  if ((r.stun || r.down) && S.auto) T.tick += 10;
+  if (r.crawl) T.z.crawl = true; T.z.atk = Math.min(75, T.z.atk + (r.atk || 0));
+  return `${name} em ${base}: −${n1(r.dmg)}% de vida. ${r.text}${r.stun || r.down ? (S.auto ? ' (+10 ticks aplicados)' : ' (sugestão: +10 ticks)') : ''}`;
+}
+function order() { return S.fs.filter(f => f.hp > 0).slice().sort((a, b) => a.tick - b.tick || (b.agi || 0) - (a.agi || 0) || ((a.kind === 'zumbi') - (b.kind === 'zumbi')) || a.id - b.id); }
+function curClock() { const al = (S.fs || []).filter(f => f.hp > 0); return al.length ? Math.min(...al.map(f => f.tick)) : 0; }
+function snap() { (S.hist = S.hist || []).push(S.fs.map(f => [f.id, f.tick])); if (S.hist.length > 30) S.hist.shift(); }
+function pressureMult() { return 1 + 0.5 * Math.max(0, (S.press || 1) - 1); }
+function shieldOk(T) { return !T.stun && !T.wounds.some(w => w.flags && w.flags.noShield && !w.treated); }
+const BASE_SPEED = { Pernas: 50, Pés: 60 };
+function speedPen(f) { let s = 0; f.wounds.forEach(w => { s = Math.max(s, w.speed || 0, (BASE_SPEED[w.region] || 0) * (w.q === 'Raspão' ? 0.5 : 1)); }); return Math.min(80, s); }
+function stepCost(f) { return f.kind === 'zumbi' ? (f.z.crawl ? 12 : 6) : Math.round(40 / (1 - speedPen(f) / 100)) / 10; }
+function addCorpse(f, t0) { if (f.corpse || f.kind === 'zumbi') return; f.corpse = true; (S.corpses = S.corpses || []).push({ id: ++S.cn, name: f.name, at: Math.round(t0) + 20 }); }
+function barrierTick() { S.hordas.forEach(g => { if (g.bar) { g.bar.R -= Math.min(g.T, g.bar.L); if (g.bar.R <= 0) { msg(g.name + ': a barreira caiu!'); g.bar = null; } } }); }
+function turnEffects() { S.fs.forEach(f => { if (f.kind !== 'zumbi' && f.hp > 0) { f.hp = Math.max(0, f.hp - bleedOf(f)); if (f.hp <= 0) addCorpse(f, S.turns * 10); } }); barrierTick(); }
+function advance() {
+  if (!S.auto) return;
+  const al = S.fs.filter(f => f.hp > 0); if (!al.length) return;
+  const clock = Math.min(...al.map(f => f.tick)); S.clock = clock; let n = 0;
+  S.fs.forEach(f => {
+    if (f.kind === 'zumbi' || f.hp <= 0) return;
+    f.wounds.forEach(w => {
+      if (w.treated || !(w.bleed > 0)) return;
+      if (w.nb == null) w.nb = clock + 10;
+      let g = 0;
+      while (w.nb <= clock && f.hp > 0 && g++ < 200) { f.hp = Math.max(0, f.hp - w.bleed); n++; if (f.hp <= 0) addCorpse(f, w.nb); w.nb += 10; }
+    });
+  });
+  S.turns = S.turns || 0; let k = 0; while ((S.turns + 1) * 10 <= clock && k++ < 200) { S.turns++; barrierTick(); }
+  if (n) msg('Sangramento aplicado (' + n + ' efeito' + (n > 1 ? 's' : '') + ')');
+}
+function msg(t) { const e = $('toast'); e.textContent = t; e.className = 'toast on'; clearTimeout(msg.t); msg.t = setTimeout(() => { e.className = 'toast'; }, 2400); }
+function resolve() {
+  const sa = S.atk, st = sa === 'P' ? 'E' : 'P', A = cur(sa), T = cur(st);
+  if (!A || !T) return msg('Escolha os dois combatentes');
+  if (A.hp <= 0 || T.hp <= 0) return msg('Um dos combatentes está morto');
+  if (A.kind === 'zumbi' && A.seg) return msg('Zumbi segurado não ataca: solte-o ou ele precisa escapar');
+  const t0 = A.tick; HT0 = t0; snap();
+  const roll = validRoll($('dr').value); if (!roll) return msg('Digite o dado do acerto (1 a 100)');
+  const zomA = A.kind === 'zumbi'; let id = S.reg[st];
+  if (zomA) { const rg = validRoll($('dg').value); if (!rg) return msg('Digite o dado da região (o zumbi não mira)'); const c = REG11.filter(r => r.base === zombieRegion(rg)); id = c[Math.floor(Math.random() * c.length)].id; }
+  else if (!id) return msg('Clique na região da silhueta do alvo');
+  const base = BASE_OF[id], sh = !!($('esc') && $('esc').checked) && T.esc > 0 && shieldOk(T), ch = chanceVs(A, T, id, sh), ch0 = chanceVs(A, T, id, false);
+  HID = id; logXP(A, roll, ch, id); let t = `${A.name} → ${T.name}, ${id}: chance ${n1(ch)}%, dado ${roll}`;
+  if (sh) { if (roll <= ch0 && ['Torso', 'Braços', 'Mãos'].includes(base)) { T.esc = Math.max(0, T.esc - 1); t += T.esc ? ` | escudo recebe o golpe (dur. ${T.esc})` : ' | o escudo QUEBROU'; } }
+  const FXO = { side: T.side, id, hit: roll <= ch, q: '', kill: false };
+  if (roll > ch) t += ': ERROU';
+  else {
+    const f = (ch - roll) / ch; let names, q, mt = '';
+    if (zomA) { let wn = zombieWound(f); q = Z_QUALITY[wn];
+      if (wn === 'Mordida' && T.mord > 0) { const dm = validRoll($('dm') ? $('dm').value : ''), md = Math.min(80, T.mord); if (!dm) mt = ` [defesa de mordida: role d100 ≤ ${md}; se passar vira Laceração]`; else if (dm <= md) { wn = 'Laceração'; q = 'Normal'; mt = ` [defesa de mordida ${dm} ≤ ${md}: vira Laceração]`; } else mt = ` [defesa de mordida falhou (${dm} > ${md})]`; }
+      names = [wn]; }
+    else { q = roll === 1 ? 'Em cheio' : qualityOf(f, A.lvl); names = REPERTOIRE[W[A.weapon][0]][QUALITIES.indexOf(q)].split(' + '); }
+    FXO.q = q;
+    const dt = names.map(n => T.kind === 'zumbi' ? zhurt(T, n, base, q) : hurt(T, n, base, q, A.kind)).join(' + ') + mt;
+    t += `: ACERTOU (folga ${Math.round(f * 100)}%, ${q}). ` + (T.side === 'E' ? names.join(' + ') + ' em ' + id + '.' : dt);
+  }
+  if (S.auto) { A.tick += cost(A); if (sh) T.tick += 5; t += ` | ticks aplicados: ${A.name} +${cost(A)}${sh ? ', ' + T.name + ' +5' : ''}`; } else t += ` | ticks sugeridos: ${A.name} +${cost(A)}${sh ? ', ' + T.name + ' +5' : ''}`;
+  if (T.hp <= 0) { t += ` | ${T.name} MORREU`; addCorpse(T, t0); }
+  A.stun = false; S.reg.P = ''; S.reg.E = '';
+  if (S.auto) { const nx = order()[0]; if (nx) { S.atk = nx.side; S.sel[nx.side] = nx.id; } }
+  FXO.kill = T.hp <= 0;
+  S.log.unshift(t); S.log.length = Math.min(S.log.length, 14); render(); combatFx(FXO);
+}
+
+/* ---------- manobras ---------- */
+const MAN = { 'Empurrar': 5, 'Derrubar': 7, 'Segurar': 6, 'Escapar': 6, 'Levantar-se': 9, 'Soltar': 0 };
+const isDown = T => T.kind === 'zumbi' ? !!(T.z.down || T.z.crawl) : !!T.caido;
+function manMult(A, T) { let m = 1; if (isDown(T) || T.seg) m *= 1.3; if (A.caido) m *= 0.7; if (A.seg) m *= 0.6; return m; }
+function manChance(k, A, T) {
+  const fo = pct(A.fo || 0), ag = pct(A.agi || 0), df = T.kind === 'zumbi' ? 1 : 1 - pct(T.fo || 0) / 200;
+  const c = k === 'Empurrar' || k === 'Segurar' ? fo * df : Math.max(fo, ag);
+  return Math.min(95, Math.max(5, Math.floor(c * (1 - penOf(A) / 100) + 1e-9)));
+}
+function manobra() {
+  const k = $('mk').value, sa = S.atk, st = sa === 'P' ? 'E' : 'P', A = cur(sa), T = cur(st);
+  if (!A || !T) return msg('Escolha os dois combatentes');
+  if (A.hp <= 0 || T.hp <= 0) return msg('Um dos combatentes está morto');
+  const tkx = (f, n) => { if (S.auto) f.tick += n; return `${f.name} +${n}`; };
+  const tl = S.auto ? 'ticks aplicados' : 'ticks sugeridos';
+  let t = `${A.name} usa ${k}` + (k === 'Escapar' || k === 'Levantar-se' ? '' : ` em ${T.name}`);
+  snap();
+  if (k === 'Levantar-se') { if (A.kind === 'zumbi') A.z.down = false; else A.caido = false; t += ` | ${tl}: ${tkx(A, 9)}`; }
+  else if (k === 'Soltar') { T.seg = false; t += ': solto (de graça)'; }
+  else {
+    if (A.kind === 'zumbi') return msg('Zumbi não faz essa manobra');
+    const roll = validRoll($('dr').value); if (!roll) return msg('Digite o dado no campo "Dado do acerto"');
+    const c = manChance(k, A, T), L = k === 'Empurrar' || k === 'Segurar' ? (A.fo || 0) : Math.max(A.fo || 0, A.agi || 0);
+    t += `: chance ${c}%, dado ${roll}`;
+    if (roll > c) { t += ': FALHOU'; if (roll > c + 30 && k !== 'Escapar') t += ` (tropeçou: ${tkx(A, 5)})`; }
+    else {
+      const q = roll === 1 ? 'Em cheio' : qualityOf((c - roll) / c, L); t += `: SUCESSO (${q}). `;
+      const down = X => { if (X.kind === 'zumbi') X.z.down = true; else X.caido = true; };
+      if (k === 'Empurrar') { if (q === 'Raspão') t += 'Recua 1 m.'; else if (q === 'Normal') t += `Recua 2 m e perde 4 ticks (${tkx(T, 4)}).`; else { down(T); t += `Cai! (${tkx(T, 4)})`; } }
+      else if (k === 'Derrubar') { down(T); t += `Caído: ataques contra ele +30%, zumbi leva dano ×2.` + (q === 'Em cheio' ? ` (${tkx(T, 4)})` : ''); }
+      else if (k === 'Segurar') { T.seg = true; t += 'Segurado: não anda, ataca −40%, ataques contra ele +30%.'; }
+      else if (k === 'Escapar') { A.seg = false; t += 'Escapou.'; }
+    }
+    t += ` | ${tl}: ${tkx(A, MAN[k])}`;
+  }
+  S.log.unshift(t); S.log.length = Math.min(S.log.length, 14); render();
+}
+/* ---------- telas ---------- */
+function silh(side) {
+  const T = cur(side), A = cur(side === 'P' ? 'E' : 'P'), ch = {};
+  REG11.forEach(r => { ch[r.id] = T && A ? chanceVs(A, T, r.id, false) : 0; });
+  return `<div class="sil" data-side="${side}">${bodySvg(ch, S.reg[side], T && T.kind === 'zumbi')}</div>`;
+}
+function panel(side) {
+  if (side === 'E') return panelE();
+  const f = cur(side);
+  let h = '<div class="tabs">' + S.fs.filter(x => x.side === side).map(x => `<button class="ft${x.id === S.sel[side] ? ' on' : ''}${x.hp <= 0 ? ' dead' : ''}${x.id === NEXT ? ' turn' : ''}" data-act="pick" data-id="${x.id}">${esc(x.name)}<small>${Math.round(x.hp)}% · t${x.tick}</small></button>`).join('');
+  h += side === 'P' ? '<button class="ft add" data-act="addf" data-s="P" data-k="humano">+ Jogador</button>' + (S.sheets.length ? '<select class="ft" data-sheet="1"><option value="">+ Ficha salva…</option>' + S.sheets.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('') + '</select>' : '') : '<button class="ft add" data-act="addf" data-s="E" data-k="humano">+ NPC</button><button class="ft add" data-act="addf" data-s="E" data-k="zumbi">+ Zumbi</button>';
+  h += '</div>';
+  h += S.auto ? '' : `<button data-act="rodada" data-s="${side}">Passou 1 turno (só ${side === 'P' ? 'jogadores' : 'inimigos'}): aplica sangramento</button>`;
+  if (!f) return h + '<p class="hint">Adicione um combatente.</p>';
+  const z = f.kind === 'zumbi', I = `data-id="${f.id}"`;
+  h += `<div class="card${f.hp <= 0 ? ' dead' : ''}"><div class="row"><input type="text" data-f="name" ${I} value="${esc(f.name)}">` + (z ? '' : `<select data-f="weapon" ${I}>${Object.keys(W).filter(k => k !== 'Zumbi').map(k => `<option${k === f.weapon ? ' selected' : ''}>${k}</option>`).join('')}</select><label title="Nível da perícia da arma (0 a 10): chance = 10 + 9 × nível">Nível em ${W[f.weapon][0]}<input type="number" min="0" max="10" data-f="lvl" ${I} value="${f.lvl}"></label><label>Força<input type="number" min="0" max="10" data-f="fo" ${I} value="${f.fo || 0}"></label><label>Agilidade<input type="number" min="0" max="10" data-f="agi" ${I} value="${f.agi || 0}"></label>`) + '</div>';
+  h += `<div class="row"><label>${z ? 'Vida do zumbi' : 'Vida'} %<input type="number" min="0" data-f="hp" ${I} value="${Math.round(f.hp * 10) / 10}"></label><label>Tick<input type="number" data-f="tick" ${I} value="${f.tick}"></label><button data-act="tcost" ${I}>+${cost(f)} (custo da arma)</button>${z ? '' : `<label>Escudo (dur.)<input type="number" min="0" data-f="esc" ${I} value="${f.esc}"></label><label>Infecção<select data-f="inf" ${I}><option value="0"${!f.inf ? ' selected' : ''}>Não</option><option value="10"${f.inf === 10 ? ' selected' : ''}>Sim (−10%)</option><option value="25"${f.inf === 25 ? ' selected' : ''}>3+ dias (−25%)</option></select></label><button data-act="fstun" ${I}>Atordoado/derrubado: ${f.stun ? 'SIM' : 'não'}</button>`}</div>${bar(f.hp, z ? '' : 'life')}`;
+  h += '<p class="hint">' + (f.hp <= 0 ? '<b>MORTO</b> · ' : '') + (z ? [f.z.down ? 'Caído (dano ×2)' : '', f.z.crawl ? 'Engatinhando' : '', f.z.atk ? `ataque −${f.z.atk}%` : '', f.seg ? 'Segurado' : ''].filter(Boolean).join(' · ') || 'De pé' : `Penalidade −${n1(penOf(f))}% · sangra ${n1(bleedOf(f))}%/turno · perícia ${pct(f.lvl)}% (nível ${f.lvl}) · ${f.weapon}: ${cost(f)} ticks${f.knox ? ' · <b>KNOX</b>' : ''}${f.caido ? ' · <b>CAÍDO</b>' : ''}${f.seg ? ' · <b>SEGURADO</b>' : ''}`) + '</p>';
+  h += (z ? '' : monitor(f)) + silh(side);
+  h += `<details><summary>Armadura <small>${esc(REG11.filter(r => f.arm[r.id] > 0).map(r => r.id + ' ' + f.arm[r.id] + '%').join(' · ') || 'sem proteção')}</small></summary><select data-pre="1" ${I}><option value="">Predefinição…</option>${Object.keys(PRE).map(k => `<option>${k}</option>`).join('')}</select><div class="agrid">${REG11.map(r => `<label>${r.id}<input type="number" min="0" max="80" data-arm="${esc(r.id)}" ${I} value="${f.arm[r.id] || 0}"></label>`).join('')}</div><label>Defesa de mordida (%, opcional)<input type="number" min="0" max="80" data-f="mord" ${I} value="${f.mord || 0}"></label></details>`;
+  if (!z && side !== 'P' && f.wounds.length) h += '<ul class="wl">' + f.wounds.map(w => woundBlock(f, w)).join('') + '</ul>';
+  return h + `<button class="lnk" data-act="delf" ${I}>Remover ${esc(f.name)}</button></div>`;
+}
+function vCombate() {
+  const alive = S.fs.filter(f => f.hp > 0); NEXT = alive.length ? order()[0].id : 0;
+  const sa = S.atk, st = sa === 'P' ? 'E' : 'P', A = cur(sa), T = cur(st), nx = fig(NEXT);
+  let h = `<div class="cols"><section>${panel('P')}</section><section>${panel('E')}</section></div><div class="ctl"><div class="seg"><button class="${sa === 'P' ? 'on' : ''}" data-act="atk" data-s="P">Jogador ataca ▶</button><button class="${sa === 'E' ? 'on' : ''}" data-act="atk" data-s="E">◀ Inimigo ataca</button></div>`;
+  const zomA = A && A.kind === 'zumbi', id = S.reg[st];
+  h += '<div class="row mleg"><span class="tg g">chance alta ≥ 60%</span><span class="tg y">média 35–59%</span><span class="tg r">baixa &lt; 35%</span></div>';
+  h += `<div class="row"><span>${A ? esc(A.name) : '—'} → ${T ? esc(T.name) : '—'} · ${zomA ? 'região sorteada pelo dado' : id ? esc(id) + (A && T ? ': ' + n1(chanceVs(A, T, id, false)) + '%' : '') : 'clique numa região do alvo'}</span><label>Dado do acerto<input type="number" id="dr" min="1" max="100"></label>${zomA ? '<label>Dado da região<input type="number" id="dg" min="1" max="100"></label>' : ''}${zomA && T && T.mord > 0 ? '<label>Dado defesa de mordida<input type="number" id="dm" min="1" max="100"></label>' : ''}${T && T.esc > 0 && shieldOk(T) ? `<label class="ck"><input type="checkbox" id="esc"> Escudo de ${esc(T.name)} (+5 ticks)</label>` : ''}<button class="go" data-act="resolve">Resolver</button></div>`;
+  h += `<div class="row"><label>Manobra<select id="mk">${Object.keys(MAN).map(k => `<option>${k}</option>`).join('')}</select></label><button data-act="manobra">Fazer manobra (usa o dado do acerto)</button></div><div class="row"><span>Age agora: <b class="who turn">${nx ? esc(nx.name) + ' (tick ' + nx.tick + ')' : '—'}</b></span><button data-act="zero">Zerar ticks</button></div><ol class="log">${S.log.map(l => `<li>${esc(l)}</li>`).join('') || '<li>Sem ataques ainda.</li>'}</ol></div>`;
+  return h;
+}
+let EXP = '';
+function vOrdem() {
+  const al = order(), dead = S.fs.filter(f => f.hp <= 0);
+  let h = `<h2>Ordem de ticks</h2><div class="card"><div class="row"><label>Nome<input type="text" id="on" placeholder="Alaric"></label><label>Tipo<select id="ok"><option value="P">Jogador</option><option value="E:humano">NPC</option><option value="E:zumbi">Zumbi</option></select></label><label>Ticks<input type="number" id="ot" placeholder="${curClock()}"></label><button class="go" data-act="oadd">Adicionar à fila</button></div><p class="hint">Age quem tem o menor tick. Digite os ticks gastos de cada pessoa e toque em Aplicar: o valor é somado ao tick dela.</p></div>`;
+  if (al.length) {
+    const n = al[0];
+    h += `<p class="res"><b>${esc(n.name)}</b> age agora (tick ${n.tick}).</p><div class="row"><button data-act="tundo">Desfazer último</button></div>`;
+  } else h += '<p class="hint">Fila vazia: adicione combatentes.</p>';
+  h += '<div class="card">' + al.map((f, i) => {
+    const I = `data-id="${f.id}"`;
+    return `<div class="row"><b>${i + 1}. ${esc(f.name)}</b><span class="tg ${f.side === 'P' ? 'g' : 'r'}">${f.kind === 'zumbi' ? 'zumbi' : f.side === 'P' ? 'jogador' : 'NPC'}</span><label>Tick<input type="number" data-f="tick" ${I} value="${f.tick}"></label><label>Ticks gastos<input type="number" id="tk${f.id}"></label><button class="go" data-act="tapply" ${I}>Aplicar</button><button class="lnk" data-act="delf" ${I}>remover</button></div>`;
+  }).join('') + '</div>';
+  if (dead.length) h += '<p class="hint">Mortos: ' + dead.map(f => esc(f.name)).join(', ') + '. Remova na aba Combate.</p>';
+  return h;
+}
+function vSalvar() {
+  return `<h2>Salvar e restaurar os dados</h2><div class="card"><p class="hint">Exportar gera um texto com tudo (combatentes, fichas, fila). Guarde-o fora do navegador; importar recoloca tudo.</p><textarea id="sv" rows="3">${esc(EXP)}</textarea><div class="row"><button data-act="sexp">Exportar</button><button class="go" data-act="simp">Importar</button></div></div>`;
+}
+function render() {
+  syncLv(); advance();
+  if (document.body) document.body.classList.toggle('panico', PG.ui.estado === 'panico');
+  if (document.body) { const pf = pFig(); document.body.classList.toggle('lowhp', !!pf && pf.kind !== 'zumbi' && pf.hp < 45); }
+  const t = S.tab;
+  $('top').innerHTML = `<nav>${[['combate', 'Combate'], ['mesa', 'Tabletop'], ['ordem', 'Ordem (ticks)'], ['mapa', 'Código do mapa'], ['ficha', 'Ficha']].map(([k, n]) => `<button class="${t === k ? 'on' : ''}" data-act="tab" data-k="${k}">${n}</button>`).join('')}<button class="ltg${LITE ? ' on' : ''}" data-act="lite" aria-pressed="${LITE}" title="Modo leve: luz do jogador simples, sem oscilação (só treme no Pânico), sem poeira e sem granulado animado">Modo leve</button><span class="seg" style="align-self:center;margin-right:.6rem"><button class="${PG.ui.estado === 'calmo' ? 'on' : ''}" data-act="pestado" data-v="calmo">Calmo</button><button class="${PG.ui.estado === 'panico' ? 'on' : ''}" data-act="pestado" data-v="panico">Pânico</button></span></nav>`;
+  document.body.classList.toggle('mesa-full', t === 'mesa'); if (t === 'mesa') window.scrollTo(0, 0);
+  mKeep(); $('app').innerHTML = (t === 'ordem' ? vOrdem() : t === 'ficha' ? vFicha() : t === 'mesa' ? vMesa() : t === 'mapa' ? vMapa() : vCombate()) + (t === 'ficha' ? popup() : '') + vConfirm(); mBack(); if (t === 'mesa') mLightInit(); if (PG.ui.scrollSel) { PG.ui.scrollSel = false; const e = document.querySelector('.sk.on'); if (e && e.scrollIntoView) e.scrollIntoView({ block: 'center' }); } save();
+}
+/* ---------- ações ---------- */
+const FX = { busy: false };
+const ECG_DELAY = 0.5, ECG_DUR = 1.9, ECG_END = 2.45, ECG_SWITCH = 3.2, CALM_SWITCH = 1.3;
+let ECG = null;
+function ecgGeom() {
+  if (ECG) return ECG;
+  const pts = [[0, 100]], pk = [];
+  [0, 330, 660].forEach(b => { [[80, 100], [100, 86], [115, 100], [150, 100], [165, 114], [185, 14], [210, 188], [230, 100], [260, 100], [280, 78], [300, 100]].forEach(q => { pts.push([b + q[0], q[1]]); if (q[0] === 185) pk.push(pts.length - 1); }); });
+  pts.push([1000, 100]);
+  const cum = [0]; for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  ECG = { d: 'M' + pts.map(p => p.join(' ')).join(' L'), fr: pk.map(i => cum[i] / cum[cum.length - 1]) };
+  return ECG;
+}
+let AC;
+function audio() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) { AC = null; } return AC; }
+function thump(t, f0, g, dur) {
+  const o = AC.createOscillator(), a = AC.createGain(); o.type = 'sine';
+  o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(36, t + dur);
+  a.gain.setValueAtTime(0.0001, t); a.gain.exponentialRampToValueAtTime(g, t + 0.012); a.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(a); a.connect(AC.destination); o.start(t); o.stop(t + dur + 0.05);
+}
+/* o som é agendado no mesmo instante em que a linha começa a desenhar */
+function sfx(panic) {
+  try {
+    if (!audio()) return;
+    const t = AC.currentTime + 0.03;
+    if (panic) {
+      ecgGeom().fr.forEach(fr => { const b = ECG_DELAY + ECG_DUR * fr; thump(t + b, 100, 0.9, 0.24); thump(t + b + 0.17, 78, 0.55, 0.22); });
+      const o = AC.createOscillator(), f = AC.createBiquadFilter(), a = AC.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(46, t); o.frequency.linearRampToValueAtTime(58, t + ECG_END);
+      f.type = 'lowpass'; f.frequency.value = 180;
+      a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(0.16, t + ECG_END - 0.1); a.gain.linearRampToValueAtTime(0.0001, t + ECG_SWITCH - 0.05);
+      o.connect(f); f.connect(a); a.connect(AC.destination); o.start(t); o.stop(t + ECG_SWITCH);
+      thump(t + ECG_END, 64, 1, ECG_SWITCH - ECG_END - 0.05);
+    } else {
+      const dur = CALM_SWITCH - 0.05, n = Math.floor(AC.sampleRate * dur), buf = AC.createBuffer(1, n, AC.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+      const src = AC.createBufferSource(), f = AC.createBiquadFilter(), a = AC.createGain();
+      src.buffer = buf; f.type = 'lowpass'; f.Q.value = 0.3; f.frequency.setValueAtTime(900, t); f.frequency.exponentialRampToValueAtTime(260, t + dur);
+      a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(0.055, t + dur * 0.35); a.gain.linearRampToValueAtTime(0.0001, t + dur);
+      src.connect(f); f.connect(a); a.connect(AC.destination); src.start(t);
+    }
+  } catch (e) { }
+}
+function setEstado(v) {
+  if (FX.busy || PG.ui.estado === v) return;
+  FX.busy = true;
+  const panic = v === 'panico', reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches), ecg = panic && !reduce;
+  const o = document.createElement('div'); o.className = 'fx' + (panic ? '' : ' slow');
+  if (ecg) o.innerHTML = `<svg class="ecg" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="${ecgGeom().d}"/></svg>`;
+  document.body.appendChild(o); audio();
+  requestAnimationFrame(() => requestAnimationFrame(() => { o.classList.add('in'); sfx(panic); }));
+  if (ecg) setTimeout(() => o.classList.add('end'), ECG_END * 1000);
+  setTimeout(() => {
+    PG.ui.estado = v; render();
+    o.classList.remove('in'); o.classList.add('out');
+    setTimeout(() => { o.remove(); FX.busy = false; }, panic ? 600 : 1000);
+  }, (panic ? ECG_SWITCH : CALM_SWITCH) * 1000);
+}
+/* ===== efeitos de combate: som de golpe e sangue, tremor, borrão ===== */
+function nzBuf(dur) { const n = Math.max(1, Math.floor(AC.sampleRate * dur)), b = AC.createBuffer(1, n, AC.sampleRate), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; return b; }
+/* tudo aqui decai devagar (cauda longa) para o som não cortar de repente */
+const TAIL = 1.8;
+function thumpX(t, f0, g, dur) { thump(t, f0, g, dur * TAIL); }
+function sweep(t, dur, type, f0, f1, g, q) {
+  dur *= TAIL;
+  const src = AC.createBufferSource(), f = AC.createBiquadFilter(), a = AC.createGain();
+  src.buffer = nzBuf(dur + 0.05); f.type = type; f.Q.value = q || 1; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(g, t + 0.01); a.gain.setTargetAtTime(0.0001, t + 0.02, dur / 4.5);
+  src.connect(f); f.connect(a); a.connect(AC.destination); src.start(t); src.stop(t + dur + 0.05);
+}
+/* sangue: respingo molhado que vai se apagando aos poucos */
+function blood(t, g, dur) {
+  dur *= TAIL;
+  const src = AC.createBufferSource(), f = AC.createBiquadFilter(), a = AC.createGain();
+  src.buffer = nzBuf(dur + 0.1); f.type = 'bandpass'; f.Q.value = 1.3;
+  f.frequency.setValueAtTime(450, t); f.frequency.exponentialRampToValueAtTime(1900, t + dur * 0.4); f.frequency.exponentialRampToValueAtTime(500, t + dur);
+  a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(g, t + 0.02);
+  for (let u = t + 0.04; u < t + dur * 0.85; u += 0.018 + Math.random() * 0.05) { const env = Math.pow(1 - (u - t) / dur, 1.6); a.gain.linearRampToValueAtTime(Math.max(0.0002, g * env * (0.25 + Math.random() * 0.75)), u); }
+  a.gain.linearRampToValueAtTime(0.0001, t + dur);
+  src.connect(f); f.connect(a); a.connect(AC.destination); src.start(t); src.stop(t + dur + 0.1);
+}
+/* "splash": jato de líquido e chiado de gotas, sem bolhas */
+function splash(t, g) {
+  sweep(t, 0.34, 'bandpass', 3800, 1000, g * 0.9, 0.8);
+  sweep(t, 0.22, 'highpass', 3000, 5200, g * 0.3, 0.7);
+  sweep(t + 0.04, 0.5, 'lowpass', 1800, 350, g * 0.35, 0.5);
+  thumpX(t, 230, g * 0.8, 0.16);
+}
+function hitSfx(q) {
+  const k = q === 'Em cheio' ? 1 : q === 'Normal' ? 0.75 : 0.5, t = AC.currentTime + 0.02;
+  if (q === 'Normal') { splash(t, 0.8); return; }
+  thumpX(t, 150, 0.9 * k, 0.2);
+  sweep(t, 0.08, 'bandpass', 2400, 800, 0.5 * k, 1.5);
+  blood(t + 0.035, 0.36 * k, 0.3 + 0.3 * k);
+  if (q === 'Em cheio') thumpX(t + 0.02, 70, 0.9, 0.38);
+}
+/* sofrer um golpe: impacto, sangue e nervosismo (coração disparando + tom tenso), tudo com cauda longa */
+function hurtSfx(q) {
+  const big = q === 'Em cheio', k = big ? 1 : 0.75, t = AC.currentTime + 0.02;
+  if (big) { thumpX(t, 120, 0.85 * k, 0.24); sweep(t, 0.07, 'bandpass', 2000, 700, 0.4 * k, 1.5); blood(t + 0.03, 0.34 * k, 0.5); } else splash(t, 0.75);
+  const n = big ? 8 : 5; let u = t + 0.32, gap = 0.21;
+  for (let i = 0; i < n; i++) { const e = 0.14 + 0.34 * Math.sin(Math.PI * (i + 0.8) / (n + 0.6)); thumpX(u, 92 + i * 5, e, 0.13); thumpX(u + 0.1, 76 + i * 4, e * 0.55, 0.1); u += gap; gap = Math.max(0.12, gap - 0.016); }
+  const len = big ? 3.2 : 2.2;
+  [1180, 1262].forEach(fr => { const o = AC.createOscillator(), a = AC.createGain(); o.type = 'sine'; o.frequency.value = fr; a.gain.setValueAtTime(0.0001, t + 0.05); a.gain.linearRampToValueAtTime(0.03, t + 0.3); a.gain.setTargetAtTime(0.0001, t + 0.4, len / 5); o.connect(a); a.connect(AC.destination); o.start(t + 0.05); o.stop(t + len + 0.3); });
+  if (big) { const o = AC.createOscillator(), a = AC.createGain(); o.type = 'sine'; o.frequency.value = 3300; a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(0.025, t + 0.1); a.gain.setTargetAtTime(0.0001, t + 0.3, 0.9); o.connect(a); a.connect(AC.destination); o.start(t); o.stop(t + 4.5); }
+}
+function missSfx() { const t = AC.currentTime + 0.02; sweep(t, 0.24, 'bandpass', 1900, 450, 0.14, 0.9); }
+function fxEl(cls, ms) { const e = document.createElement('div'); e.className = cls; document.body.appendChild(e); setTimeout(() => e.remove(), ms); }
+function combatFx(o) {
+  const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches), toP = o.side === 'P', strong = o.q === 'Normal' || o.q === 'Em cheio';
+  try { if (audio()) { if (o.hit && o.q === 'Em cheio') { if (toP) hurtSfx(o.q); else hitSfx(o.q); } } } catch (e) { }
+  try {
+    const sil = document.querySelector('.sil[data-side="' + o.side + '"]');
+    if (!o.hit) { if (sil && !reduce) { sil.classList.add('miss'); setTimeout(() => sil.classList.remove('miss'), 450); } return; }
+    document.querySelectorAll('.sil[data-side="' + o.side + '"] .rg').forEach(el => { if (el.dataset.r === o.id) { el.classList.add('hitflash'); setTimeout(() => el.classList.remove('hitflash'), 900); } });
+    if (toP && strong) {
+      fxEl('hitvig', 900);
+      if (o.q === 'Em cheio' && !reduce) {
+        fxEl('hitblur', 1100);
+        ['app', 'top'].forEach(id => { const e = $(id); if (!e) return; e.classList.remove('shk'); void e.offsetWidth; e.classList.add('shk'); setTimeout(() => e.classList.remove('shk'), 700); });
+      }
+    }
+  } catch (e) { }
+}
+function act(a, d, el) {
+  if (a === 'mundo') { mUndo(); return; }
+  const _ms = S.tab === 'mesa' ? mSnapStr() : null;
+  if (a === 'lite') { setLite(!LITE); return; }
+  if (a === 'tab') clickSfx();
+  if (a === 'pestado') { setEstado(d.v); return; }
+  if (pAct(a, d, el)) { render(); return; }
+  switch (a) {
+    case 'tapply': { const f = fig(d.id), n = parseFloat(String($('tk' + d.id).value).replace(',', '.')); if (!isFinite(n)) return msg('Digite os ticks gastos'); snap(); f.tick += n; break; }
+    case 'tadd': snap(); fig(d.id).tick += +d.n; break;
+    case 'tstep': snap(); fig(d.id).tick += stepCost(fig(d.id)); break;
+    case 'tall': snap(); S.fs.filter(f => f.hp > 0).forEach(f => { f.tick += +d.n; }); break;
+    case 'tundo': { const h = S.hist && S.hist.pop(); if (!h) return msg('Nada para desfazer'); h.forEach(([id, tk]) => { const f = fig(id); if (f) f.tick = tk; }); break; }
+    case 'goact': { const f = fig(d.id); S.atk = f.side; S.sel[f.side] = f.id; S.tab = 'combate'; break; }
+    case 'fstun': { const f = fig(d.id); f.stun = !f.stun; break; }
+    case 'oadd': { const v = $('ok').value, side = v[0], kind = v.indexOf('zumbi') > 0 ? 'zumbi' : 'humano', f = addF(side, kind), nm = $('on').value.trim(), tv = $('ot').value; if (nm) f.name = nm; f.tick = tv === '' ? curClock() : (parseFloat(tv) || 0); break; }
+    case 'sexp': EXP = JSON.stringify(S); break;
+    case 'simp': try { const o = JSON.parse($('sv').value); if (!o || !Array.isArray(o.fs)) throw 0; S = Object.assign(fresh(), o); S.auto = true; delete S.engol; EXP = ''; fixState(); msg('Dados restaurados'); } catch (e) { return msg('Esse texto não é um backup válido'); } break;
+    case 'tab': S.tab = d.k; S.pop = ''; MZ.menu = false; MZ.place = 0; MZ.cf = null; break;
+    case 'mmenu': MZ.menu = true; break;
+    case 'mclose': MZ.menu = false; break;
+    case 'mpick': MZ.menu = false; MZ.place = +d.id; break;
+    case 'mcancel': MZ.place = 0; break;
+    case 'mrem': { const t = mtk(d.id), f = t && mf(t); if (!f) break; ask('Tirar ' + f.name + ' do mapa?' + (t.id < 0 ? ' A ficha guardada dele também será apagada.' : ''), () => mDel(t.id)); break; }
+    case 'cfok': { const c = MZ.cf; MZ.cf = null; if (c) c.fn(); break; }
+    case 'cfno': MZ.cf = null; break;
+    case 'mclear': ask('Apagar todos os NPCs do mapa (fichas guardadas e tokens de NPC e zumbi)?', () => { S.mesa.st = []; S.mesa.tk = S.mesa.tk.filter(t => { const f = t.id > 0 && fig(t.id); return f && f.side === 'P'; }); S.mesa.sel = 0; }); break;
+    case 'mcexp': { const c = mapExport(); if (!c) return msg('Não há nada no mapa para exportar'); MAPTXT = c; break; }
+    case 'mccopy': { const ta = $('mapcode'); if (!ta || !ta.value) return msg('Gere o código primeiro'); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) { } if (ok) msg('Código copiado'); else if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(() => msg('Código copiado'), () => msg('Selecione o texto e copie manualmente')); else msg('Selecione o texto e copie manualmente'); return; }
+    case 'mcimp': mapImportFrom(($('mapcode') || {}).value); break;
+    case 'mcfile': {
+      const c = mapExport(true); if (!c) return msg('Não há nada no mapa para exportar');
+      try { const u = URL.createObjectURL(new Blob([c], { type: 'text/plain' })), a = document.createElement('a'); a.href = u; a.download = 'mapa-zomboid.zmap.txt'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(u); a.remove(); }, 1500); msg('Arquivo do mapa baixado' + (S.mesa.im && MZ.img ? ' (com a imagem de fundo)' : '')); } catch (e) { msg('Não consegui gerar o arquivo'); }
+      return;
+    }
+    case 'mcopen': { const i = $('mcfile'); if (i) i.click(); return; }
+    case 'mcnew': {
+      const g = id => ($(id) || {}).value, nm = String(g('mcn') || '').trim().slice(0, 30) || 'NPC', id = S.mesa.sn++;
+      S.mesa.st.push({ id, name: nm, kind: g('mck') === 'zumbi' ? 'zumbi' : 'humano', f: mClean({ w: g('mcw'), l: g('mcl'), fo: g('mcf'), ag: g('mca'), hp: g('mch'), a: mkArm(PRE[g('mcp')] || {}), e: 0, m: 0 }) });
+      mPut(-id, Math.floor(MC / 2), Math.floor(MR / 2)); msg(nm + ' guardado. Arraste o token no Tabletop para a posição.'); break;
+    }
+    case 'mfight': mFight(d.id); break;
+    case 'mlock': S.mesa.lock = !S.mesa.lock; break;
+    case 'mwlock': S.mesa.wlock = !S.mesa.wlock; S.mesa.wsel = 0; break;
+    case 'mwdel': S.mesa.walls = mWl().filter(w => w.id !== +d.id); S.mesa.wsel = 0; break;
+    case 'mwadd': {
+      if (S.mesa.wlock) break;
+      const wr = document.querySelector('.mesa-wrap'), len = MS * 1.5, id = (S.mesa.wn = (S.mesa.wn || 0) + 1);
+      const cx = Math.max(len, Math.min(MC * MS - len, wr ? (wr.scrollLeft + wr.clientWidth / 2) / mK() : MC * MS / 2)), cy = Math.max(8, Math.min(MR * MS - 8, wr ? (wr.scrollTop + wr.clientHeight / 2) / mK() : MR * MS / 2));
+      mWl().push({ id, x1: (cx - len) / MS, y1: cy / MS, x2: (cx + len) / MS, y2: cy / MS }); S.mesa.wsel = id; S.mesa.sel = 0; break;
+    }
+    case 'mdadd': {
+      if (S.mesa.wlock) break;
+      const wr = document.querySelector('.mesa-wrap'), len = MS * .5, id = (S.mesa.wn = (S.mesa.wn || 0) + 1);
+      const cx = Math.max(len, Math.min(MC * MS - len, wr ? (wr.scrollLeft + wr.clientWidth / 2) / mK() : MC * MS / 2)), cy = Math.max(8, Math.min(MR * MS - 8, wr ? (wr.scrollTop + wr.clientHeight / 2) / mK() : MR * MS / 2));
+      mWl().push({ id, x1: (cx - len) / MS, y1: cy / MS, x2: (cx + len) / MS, y2: cy / MS, door: 1, open: 0 }); S.mesa.wsel = id; S.mesa.sel = 0; break;
+    }
+    case 'mdtog': { const w = mWl().find(x => x.id === +d.id); if (w && w.door) w.open = w.open ? 0 : 1; break; }
+    case 'mvfit': mZoom(() => { MZ.vz = 0; }); break;
+    case 'mvz': mZoom(k0 => { MZ.vz = Math.max(20, Math.min(300, Math.round(k0 * 100 * (+d.d > 0 ? 1.25 : .8)))); }); break;
+    case 'mvz100': mZoom(() => { MZ.vz = 100; }); break;
+    case 'mlant': S.mesa.lantOff = !S.mesa.lantOff; break;
+    case 'mimgpick': { const i = $('mimg'); if (i) i.click(); return; }
+    case 'mimgdel': ask('Remover a imagem de fundo do mapa?', () => { mSetImg(''); S.mesa.im = null; }); break;
+    case 'mimgdec': mStep(-1); break;
+    case 'mimginc': mStep(1); break;
+    case 'mimgfit': if (S.mesa.im) S.mesa.im = mFit(S.mesa.im.ar); break;
+    case 'wpop': S.pop = d.r; S.popf = +d.id; break;
+    case 'wclose': S.pop = ''; break;
+    case 'shadd': { try { const sh = parseSheet($('shc').value); const old = S.sheets.find(x => x.name === sh.name); if (old) { sh.id = old.id; sh.eq = old.eq; S.sheets[S.sheets.indexOf(old)] = sh; } else { sh.id = S.sid++; S.sheets.push(sh); } const tb = S.tab; pullSheet(sh.id); S.tab = tb; msg('Ficha de ' + sh.name + ' salva e levada ao combate'); } catch (e) { return msg('Esse texto não é uma ficha válida'); } break; }
+    case 'shpull': pullSheet(d.id); break;
+    case 'shdel': S.sheets = S.sheets.filter(x => x.id !== +d.id); break;
+    case 'pick': { const f = fig(d.id); S.sel[f.side] = f.id; S.reg[f.side] = ''; break; }
+    case 'addf': addF(d.s, d.k); break;
+    case 'delf': { const f = fig(d.id); if (!f) break; const del = () => { S.fs = S.fs.filter(x => x.id !== f.id); S.mesa.tk = S.mesa.tk.filter(t => t.id !== f.id); S.sel[f.side] = (S.fs.find(x => x.side === f.side) || {}).id || 0; }; if (mtk(f.id)) ask('Remover ' + f.name + '? O token dele também some do mapa.', del); else del(); break; }
+    case 'atk': S.atk = d.s; break;
+    case 'region': { const s = el.closest('[data-side]').dataset.side; S.reg[s] = el.dataset.r; break; }
+    case 'manobra': return manobra();
+    case 'resolve': return resolve();
+    case 'rodada': S.fs.filter(f => f.side === d.s).forEach(f => { if (f.kind !== 'zumbi' && f.hp > 0) f.hp = Math.max(0, f.hp - bleedOf(f)); }); msg('Sangramento aplicado só ' + (d.s === 'P' ? 'aos jogadores' : 'aos inimigos')); break;
+    case 'tcost': fig(d.id).tick += cost(fig(d.id)); break;
+    case 'zero': S.fs.forEach(f => { f.tick = 0; f.wounds.forEach(w => { w.nb = 10; }); }); S.clock = 0; S.turns = 0; S.hist = []; break;
+    case 'wtreat': fig(d.id).wounds.forEach(w => { if (w.id === d.w) w.treated = true; }); break;
+    case 'wheal': { const f = fig(d.id); f.wounds = f.wounds.filter(w => w.id !== d.w); break; }
+  }
+  if (_ms && mSnapStr() !== _ms) mPush(_ms);
+  render();
+}
+function chg(el) {
+  const d = el.dataset, f = d.id && fig(d.id);
+  if (d.chg) { pChange(d.chg, d, el.value, el.checked); return; }
+  if (d.sx) { S.press = Math.max(1, parseInt(el.value, 10) || 1); render(); }
+  else if (d.shl) { const sh = S.sheets.find(x => x.id === +d.shl); if (sh) { sh.skills[d.k] = Math.max(0, Math.min(10, Math.round(+el.value || 0))); S.fs.filter(x => x.sheet === sh.id).forEach(f => { f.lvl = sh.skills[W[f.weapon][0]] || 0; f.agi = sh.skills['Agilidade'] || 0; f.fo = sh.skills['Força'] || 0; }); } render(); }
+  else if (d.sheet) { if (el.value) pullSheet(el.value); render(); }
+  else if (d.f && f) { if (d.f === 'name' || d.f === 'weapon') { f[d.f] = el.value; if (d.f === 'weapon' && f.sheet) { const sh = S.sheets.find(x => x.id === f.sheet); if (sh) f.lvl = sh.skills[W[f.weapon][0]] || 0; } } else { const n = parseFloat(String(el.value).replace(',', '.')); f[d.f] = isFinite(n) ? Math.max(0, n) : 0; if (d.f === 'lvl') f.lvl = Math.min(10, Math.round(f.lvl)); if (d.f === 'frio' || d.f === 'cans') f[d.f] = Math.min(100, f[d.f]); } render(); }
+  else if (d.wchk && f) { const w = f.wounds.find(x => x.id === d.w); if (w) { w.chk = w.chk || {}; w.chk[d.wchk] = el.checked; if (!reqsFor(w).every(r => w.chk[r.k])) { if (w.treated) w.nb = curClock() + 10; w.treated = false; } } render(); }
+  else if (d.wcure && f) { if (el.checked) f.wounds = f.wounds.filter(x => x.id !== d.w); render(); }
+  else if (d.wtr && f) { const w = f.wounds.find(x => x.id === d.w); if (w) { w.treated = el.checked && reqsFor(w).every(r => (w.chk || {})[r.k]); if (!w.treated) w.nb = curClock() + 10; } render(); }
+  else if (d.arm && f) { f.arm[d.arm] = Math.min(80, Math.max(0, Math.round(+el.value || 0))); render(); }
+  else if (d.pre && f && PRE[el.value]) { f.arm = mkArm(PRE[el.value]); render(); }
+}
+const SPECS = ['Lâminas Curtas', 'Lâminas Longas', 'Machados', 'Lanças', 'Contundentes Curtos', 'Contundentes Longos'];
+function parseSheet(txt) {
+  const o = JSON.parse(txt); if (!o || typeof o !== 'object' || !o.skills || typeof o.skills !== 'object') throw 0;
+  const skills = {}; Object.keys(o.skills).forEach(k => { skills[k] = Math.max(0, Math.min(10, +(o.skills[k] || {}).lvl || 0)); });
+  const arm = {}, t = o.armor && o.armor.target;
+  if (Array.isArray(t)) REG11.forEach(r => { const v = blockPct(r.base, t.filter(i => ARMOR[i])); if (v) arm[r.id] = v; });
+  else if (t && typeof t === 'object') REG11.forEach(r => { const v = blockValue(r.id, t[r.id]); if (v) arm[r.id] = v; });
+  return { name: String(o.name || 'Jogador').slice(0, 40), skills, arm };
+}
+function pullSheet(id) {
+  const sh = S.sheets.find(x => x.id === +id); if (!sh) return;
+  let f = S.fs.find(x => x.sheet === sh.id);
+  if (!f) { f = addF('P', 'humano'); f.sheet = sh.id; f.weapon = 'Machadinha'; f.esc = sh.eq ? 8 : 0; }
+  f.name = sh.name; f.arm = Object.assign({}, sh.arm); f.lvl = sh.skills[W[f.weapon][0]] || 0; f.agi = sh.skills['Agilidade'] || 0; f.fo = sh.skills['Força'] || 0;
+  S.sel.P = f.id; S.reg.P = ''; S.tab = 'combate';
+}
+const CATS = [
+  { id: 'Rural', skills: ['Abate', 'Agricultura', 'Cuidados com Animais'] },
+  { id: 'Combate — Armas de Fogo', skills: ['Pontaria', 'Recarga'] },
+  { id: 'Combate — Corpo a Corpo', skills: ['Contundentes Curtos', 'Contundentes Longos', 'Lanças', 'Lâminas Curtas', 'Lâminas Longas', 'Machados', 'Manutenção'] },
+  { id: 'Fabricação', skills: ['Alvenaria', 'Carpintaria', 'Cerâmica', 'Costura', 'Culinária', 'Elétrica', 'Entalhamento', 'Ferraria', 'Lascamento', 'Mecânica', 'Soldagem', 'Vidraria'] },
+  { id: 'Física', skills: ['Agilidade', 'Aptidão Física', 'Corrida', 'Discrição', 'Força', 'Furtividade'] },
+  { id: 'Sobrevivência', skills: ['Armadilhas', 'Coleta', 'Pesca', 'Primeiros Socorros', 'Rastreamento'] },
+];
+const CAT_OF = {};
+CATS.forEach(c => c.skills.forEach(s => { CAT_OF[s] = c.id; }));
+const SYN = [['Cuidados com Animais', 'Pesca'], ['Agricultura', 'Culinária'], ['Pesca', 'Culinária'], ['Mecânica', 'Ferraria'], ['Carpintaria', 'Alvenaria'], ['Cuidados com Animais', 'Abate'], ['Lâminas Curtas', 'Abate'], ['Abate', 'Culinária'], ['Abate', 'Costura'], ['Agricultura', 'Coleta'], ['Coleta', 'Primeiros Socorros'], ['Costura', 'Primeiros Socorros'], ['Cuidados com Animais', 'Rastreamento'], ['Furtividade', 'Rastreamento'], ['Rastreamento', 'Armadilhas'], ['Carpintaria', 'Armadilhas'], ['Armadilhas', 'Pesca'], ['Aptidão Física', 'Força'], ['Aptidão Física', 'Agilidade'], ['Aptidão Física', 'Corrida'], ['Agilidade', 'Corrida'], ['Agilidade', 'Furtividade'], ['Discrição', 'Furtividade'], ['Força', 'Contundentes Curtos'], ['Contundentes Curtos', 'Contundentes Longos'], ['Força', 'Contundentes Longos'], ['Contundentes Longos', 'Lanças'], ['Contundentes Longos', 'Machados'], ['Força', 'Machados'], ['Agilidade', 'Lâminas Curtas'], ['Lâminas Curtas', 'Lâminas Longas'], ['Força', 'Lâminas Longas'], ['Ferraria', 'Manutenção'], ['Mecânica', 'Manutenção'], ['Rastreamento', 'Pontaria'], ['Pontaria', 'Recarga'], ['Mecânica', 'Recarga'], ['Carpintaria', 'Entalhamento'], ['Lâminas Curtas', 'Entalhamento'], ['Alvenaria', 'Lascamento'], ['Alvenaria', 'Cerâmica'], ['Cerâmica', 'Vidraria'], ['Ferraria', 'Vidraria'], ['Mecânica', 'Elétrica'], ['Elétrica', 'Soldagem'], ['Ferraria', 'Soldagem'], ['Força', 'Ferraria']];
+const COST = { A: 225, p: 1.5 };
+
+const costBase = L => Math.round(COST.A * Math.pow(Math.max(L, 1), COST.p));
+const fFail = m => 3 * Math.exp(-m / 15);
+const fSucc = s => 0.6 * s / (s + 10);
+function resultF(chance, roll) {
+  if (roll <= chance) { const s = chance - roll; return { ok: true, margin: s, f: fSucc(s) }; }
+  const m = roll - chance; return { ok: false, margin: m, f: fFail(m) };
+}
+function xpValues(o) { // {K, basePct, catPct, f, calm, instinctOnly}
+  if (o.instinctOnly) return { tech: 0, inst: o.K * (1 - o.catPct / 100) * o.f };
+  return {
+    tech: o.K * (1 - o.basePct / 100) * o.f * (o.calm ? 1.0 : 0.2),
+    inst: o.K * (1 - o.catPct / 100) * o.f * (o.calm ? 0.3 : 0.8),
+  };
+}
+function discount(skills, cats, name) {
+  let s = 0;
+  SYN.forEach(([a, b]) => { if (b === name) s += 0.05 * skills[a].lvl; });
+  s = Math.min(0.40, s);
+  const c = Math.min(0.10, 0.01 * cats[CAT_OF[name]].lvl);
+  return { skill: s, cat: c, total: Math.min(0.5, s + c) };
+}
+const skillCost = (skills, cats, name) => costBase(skills[name].lvl) * (1 - discount(skills, cats, name).total);
+
+function reasonOf(e) {
+  const cond = e.calm ? 'sob condições ideais' : 'em pânico';
+  let t;
+  if (e.ok) t = e.margin === 0 ? 'acerto raspando' : (e.margin >= 20 ? 'acerto com folga' : 'acerto normal');
+  else t = e.margin <= 10 ? 'falha por pouco' : (e.margin <= 30 ? 'falha moderada' : 'falha por muito (azar)');
+  return t + ' ' + cond;
+}
+
+function synHasCycle() {
+  const adj = {}; SYN.forEach(([a, b]) => { (adj[a] = adj[a] || []).push(b); });
+  const st = {};
+  const go = u => { st[u] = 1; for (const v of (adj[u] || [])) { if (st[v] === 1) return true; if (!st[v] && go(v)) return true; } st[u] = 2; return false; };
+  return Object.keys(adj).some(u => !st[u] && go(u));
+}
+
+/* Sobe de nível enquanto o XP pagar o custo. Memórias musculares primeiro (o desconto delas vale para as perícias). */
+function levelUpAll(S) {
+  const ups = {}; let guard = 0, changed = true;
+  const note = (kind, name, from, to) => { const k = kind + ':' + name; ups[k] = ups[k] ? { kind, name, from: ups[k].from, to } : { kind, name, from, to }; };
+  while (changed && guard++ < 80) {
+    changed = false;
+    CATS.forEach(c => {
+      const e = S.cats[c.id];
+      while (e.lvl < 10 && e.xp >= costBase(e.lvl)) { const f = e.lvl; e.xp -= costBase(e.lvl); e.lvl++; note('cat', c.id, f, e.lvl); changed = true; }
+    });
+    CATS.forEach(c => c.skills.forEach(s => {
+      const e = S.skills[s];
+      while (e.lvl < 10 && e.xp >= skillCost(S.skills, S.cats, s)) { const f = e.lvl; e.xp -= skillCost(S.skills, S.cats, s); e.lvl++; note('skill', s, f, e.lvl); changed = true; }
+    }));
+  }
+  return Object.values(ups);
+}
+
+/* Registro: guarda tudo que é preciso para calcular o XP no descanso. Não calcula XP. */
+function makeEntry(S, kind, name, roll, calm, extra) {
+  const cat = kind === 'cat' ? name : CAT_OF[name];
+  const base = kind === 'cat' ? pct(S.cats[name].lvl) : pct(S.skills[name].lvl);
+  const catPct = pct(S.cats[cat].lvl);
+  const chance = extra && extra.chance !== undefined ? extra.chance : base; // ataque: chance da região
+  const r = resultF(chance, roll);
+  return { id: Date.now() + '-' + Math.random().toString(36).slice(2, 7), kind, name, cat, roll, calm: kind === 'cat' ? true : calm, base, catPct, chance, region: extra && extra.region ? extra.region : null, ok: r.ok, margin: r.margin, f: r.f };
+}
+
+/* Descanso: calcula o XP de todos os registros guardados, distribui, sobe de nível e esvazia a fila. */
+function processRest(S) {
+  const lines = [], gainS = {}, gainC = {};
+  S.pending.forEach(e => {
+    const x = xpValues({ K: S.K, basePct: e.base, catPct: e.catPct, f: e.f, calm: e.calm, instinctOnly: e.kind === 'cat' });
+    const used = e.chance !== undefined ? e.chance : e.base;
+    const head = e.region ? `${e.name} (ataque em ${e.region}): dado ${e.roll} contra ${fmt1(used)}%.` : `${e.name}: dado ${e.roll} contra ${fmt1(used)}%.`;
+    if (e.kind === 'skill') {
+      gainS[e.name] = (gainS[e.name] || 0) + x.tech;
+      lines.push({ txt: `${head} Você ganhou ${fmt1(x.tech)} XP em ${e.name}. Motivo: ${reasonOf(e)}.` });
+    }
+    gainC[e.cat] = (gainC[e.cat] || 0) + x.inst;
+    lines.push({ txt: e.kind === 'cat'
+      ? `${head} Você ganhou ${fmt1(x.inst)} XP em ${e.cat} (memória muscular). Motivo: ação instintiva, ${reasonOf(e).replace(' sob condições ideais', '')}.`
+      : `Você ganhou ${fmt1(x.inst)} XP em ${e.cat} (memória muscular). Motivo: instinto acumulado ${e.calm ? 'em calma' : 'em pânico'}.` });
+  });
+  Object.keys(gainS).forEach(n => { S.skills[n].xp += gainS[n]; });
+  Object.keys(gainC).forEach(n => { S.cats[n].xp += gainC[n]; });
+  const ups = levelUpAll(S);
+  const status = [];
+  Object.keys(gainS).forEach(n => {
+    const e = S.skills[n], d = discount(S.skills, S.cats, n);
+    status.push(e.lvl >= 10 ? `${n}: Nível máximo.` : `${n}: Nível ${e.lvl}, XP ${fmt1(e.xp)}. Custo para o próximo nível: ${fmt0(skillCost(S.skills, S.cats, n))} XP${d.total ? ' (Sinergia: −' + Math.round(d.total * 100) + '%)' : ''}.`);
+  });
+  Object.keys(gainC).forEach(n => {
+    const e = S.cats[n];
+    status.push(e.lvl >= 10 ? `${n} (memória muscular): Nível máximo.` : `${n} (memória muscular): Nível ${e.lvl}, XP ${fmt1(e.xp)}. Custo para o próximo nível: ${fmt0(costBase(e.lvl))} XP.`);
+  });
+  return { count: S.pending.length, lines: lines.map(l => l.txt), status, ups: ups.map(u => `${u.name}${u.kind === 'cat' ? ' (memória muscular)' : ''} subiu do Nível ${u.from} para o ${u.to}.`) };
+}
+function fmt1(n) { return (Math.round(n * 10) / 10).toLocaleString('pt-BR'); }
+function fmt0(n) { return Math.round(n).toLocaleString('pt-BR'); }
+
+
+Object.defineProperty(globalThis, 'PG', { get() { return S.prog; } });
+const xpv = n => String(Math.round(n * 10) / 10);
+function freshProg() { const skills = {}, cats = {}; CATS.forEach(c => { cats[c.id] = { lvl: 0, xp: 0 }; c.skills.forEach(s => { skills[s] = { lvl: 0, xp: 0 }; }); }); return { K: 20, skills, cats, pending: [], report: null, undo: null, ui: { open: {}, sel: null, roll: '', estado: 'calmo', last: null, editXp: false, scrollSel: false } }; }
+function fixState() {
+  if (!S.mesa || !Array.isArray(S.mesa.tk)) S.mesa = { tk: [], sel: 0, auto: false, lock: false, st: [], sn: 1 };
+  S.mesa.sel = 0; if (!Array.isArray(S.mesa.st)) S.mesa.st = []; if (!(S.mesa.sn > 0)) S.mesa.sn = 1;
+  if (!S.prog || !S.prog.skills) { S.prog = freshProg(); const sh = S.sheets[0]; if (sh) Object.keys(sh.skills).forEach(k => { if (S.prog.skills[k]) S.prog.skills[k].lvl = sh.skills[k]; }); }
+  S.fs.forEach(f => f.wounds.forEach(w => { if (!w.side) { const r = REG11.find(r => r.base === w.region); if (r) w.side = r.id; } }));
+}
+function syncLv() {
+  const sh = S.sheets[0]; if (!sh || !PG) return;
+  SPECS.concat(['Agilidade', 'Força']).forEach(k => { if (PG.skills[k]) sh.skills[k] = PG.skills[k].lvl; });
+  S.fs.filter(x => x.sheet === sh.id).forEach(f => { f.lvl = sh.skills[W[f.weapon][0]] || 0; f.agi = sh.skills['Agilidade'] || 0; f.fo = sh.skills['Força'] || 0; });
+}
+function logXP(A, roll, ch, id) { const sp = W[A.weapon] && W[A.weapon][0]; if (A.sheet && A.kind === 'humano' && PG.skills[sp]) PG.pending.push(makeEntry(PG, 'skill', sp, roll, PG.ui.estado === 'calmo', { chance: ch, region: id })); }
+function stepper(kind, name, lvl) {
+  return `<span class="st"><button type="button" data-act="plvl" data-k="${kind}" data-n="${esc(name)}" data-d="-1" aria-label="Diminuir nível">−</button><b>${lvl}</b><button type="button" data-act="plvl" data-k="${kind}" data-n="${esc(name)}" data-d="1" aria-label="Aumentar nível">+</button></span>`;
+}
+const isSel = (k, n) => PG.ui.sel && PG.ui.sel.kind === k && PG.ui.sel.name === n;
+
+/* ===================== FICHA ===================== */
+function synBlock(name) {
+  const src = SYN.filter(e => e[1] === name).map(e => e[0]), tgt = SYN.filter(e => e[0] === name).map(e => e[1]), d = discount(PG.skills, PG.cats, name);
+  const chip = (n, lv) => `<button type="button" class="chipb" data-act="pgoto" data-n="${esc(n)}">${esc(n)}${lv ? ' <em>Nív ' + PG.skills[n].lvl + '</em>' : ''}</button>`;
+  let h = '<div class="syn"><h4>Sinergias</h4>';
+  h += src.length ? `<p class="hint">Recebe desconto de:</p><div class="chips">${src.map(n => chip(n, true)).join('')}</div>` : '<p class="hint">Não recebe desconto de nenhuma especialização.</p>';
+  h += `<p class="hint">Desconto atual: <b>${Math.round(d.skill * 100)}%</b> das especializações${d.cat ? ' + <b>' + Math.round(d.cat * 100) + '%</b> da memória muscular' : ''} = <b>${Math.round(d.total * 100)}%</b> no custo.</p>`;
+  h += tgt.length ? `<p class="hint">Ajuda a evoluir:</p><div class="chips">${tgt.map(n => chip(n, false)).join('')}</div>` : '<p class="hint">Não ajuda nenhuma outra.</p>';
+  return h + '</div>';
+}
+function pPanel() {
+  const sel = PG.ui.sel; if (!sel) return '';
+  const inst = sel.kind === 'cat';
+  const lvl = inst ? PG.cats[sel.name].lvl : PG.skills[sel.name].lvl, chance = pct(lvl), u = PG.ui;
+  let h = `<div class="panel"><h3>${inst ? 'Ação instintiva' : 'Registrar teste'}</h3><p class="what"><b>${esc(inst ? sel.name + ' (memória muscular)' : sel.name)}</b> · chance de ${chance}%</p>`;
+  if (!inst) h += `<p class="hint estl">Estado emocional: <b>${u.estado === 'calmo' ? 'Calmo' : 'Pânico'}</b>. Para mudar, use a chave no topo.</p>`;
+  else h += '<p class="hint">Rolagem direta contra a memória muscular. O XP vai só para ela, igual em calma ou pânico.</p>';
+  h += `<label class="fld">Resultado do dado (1 a 100)<input type="number" min="1" max="100" inputmode="numeric" data-chg="roll" data-enter="pregister" value="${esc(u.roll)}" placeholder="Ex.: 47"></label>`;
+  h += '<button type="button" class="btn" data-act="pregister">Registrar</button>';
+  if (u.last) h += `<div class="last ${u.last.ok ? 'ok' : 'ko'}"><b>${u.last.ok ? 'Sucesso' : 'Falha'}</b> em ${esc(u.last.name)}: dado ${u.last.roll} contra ${u.last.base}%. O XP chega no descanso.</div>`;
+  if (!inst) h += synBlock(sel.name);
+  return h + '</div>';
+}
+function reportBlock() {
+  const r = PG.report; if (!r) return '';
+  let h = `<section class="report" aria-live="polite"><h2>Descanso concluído</h2><p class="hint">${r.count} ${r.count === 1 ? 'registro processado' : 'registros processados'}.</p>`;
+  if (r.ups.length) h += '<div class="ups">' + r.ups.map(u => `<div class="up">${esc(u)}</div>`).join('') + '</div>';
+  h += '<h3>Ganhos</h3><ul class="log">' + r.lines.map(l => `<li>${esc(l)}</li>`).join('') + '</ul>';
+  h += '<h3>Situação agora</h3><ul class="log">' + r.status.map(l => `<li>${esc(l)}</li>`).join('') + '</ul>';
+  h += '<div class="btns"><button type="button" class="btn ghost" data-act="pcloserep">Fechar relatório</button><button type="button" class="btn ghost" data-act="pundorest">Desfazer este descanso</button></div></section>';
+  return h;
+}
+function skillRow(name) {
+  const k = PG.skills[name], d = discount(PG.skills, PG.cats, name), cs = skillCost(PG.skills, PG.cats, name), pg = k.lvl >= 10 ? 100 : k.xp / cs * 100, on = isSel('skill', name);
+  let h = `<li class="sk${on ? ' on' : ''}"><div class="skrow"><button type="button" class="pick" data-act="ppick" data-k="skill" data-n="${esc(name)}" aria-pressed="${on}"><span class="nm">${esc(name)}</span><span class="sub">${pct(k.lvl)}% de chance · ${k.lvl >= 10 ? 'nível máximo' : 'XP ' + xpv(k.xp) + ' de ' + Math.round(cs).toLocaleString('pt-BR') + (d.total ? ' (−' + Math.round(d.total * 100) + '%)' : '')}</span>${bar(pg)}</button>${stepper('skill', name, k.lvl)}</div>`;
+  if (PG.ui.editXp) h += `<label class="xpedit">XP <input type="number" step="0.1" min="0" inputmode="decimal" data-chg="xp" data-k="skill" data-n="${esc(name)}" value="${xpv(k.xp)}"></label>`;
+  if (on) h += pPanel();
+  return h + '</li>';
+}
+function catSection(c) {
+  const e = PG.cats[c.id], cost = costBase(e.lvl), pg = e.lvl >= 10 ? 100 : e.xp / cost * 100, on = isSel('cat', c.id);
+  let h = `<details class="cat" data-cat="${esc(c.id)}"${PG.ui.open[c.id] ? ' open' : ''}><summary><span class="cn">${esc(c.id)}</span><span class="cl">Nível ${e.lvl} · ${pct(e.lvl)}%</span>${bar(pg, 'cat')}</summary><div class="catbody">`;
+  h += `<div class="mm"><div class="mmh"><span><b>Memória muscular</b><span class="sub">${e.lvl >= 10 ? 'nível máximo' : 'XP ' + xpv(e.xp) + ' de ' + cost.toLocaleString('pt-BR')} · desconto de ${Math.min(10, e.lvl)}% nas especializações</span></span>${stepper('cat', c.id, e.lvl)}</div>`;
+  if (PG.ui.editXp) h += `<label class="xpedit">XP <input type="number" step="0.1" min="0" inputmode="decimal" data-chg="xp" data-k="cat" data-n="${esc(c.id)}" value="${xpv(e.xp)}"></label>`;
+  h += '</div><ul class="skills">';
+  h += `<li class="sk inst${on ? ' on' : ''}"><div class="skrow"><button type="button" class="pick" data-act="ppick" data-k="cat" data-n="${esc(c.id)}" aria-pressed="${on}"><span class="nm">Ação instintiva</span><span class="sub">Rolagem direta contra a memória muscular (${pct(e.lvl)}%)</span></button></div>${on ? pPanel() : ''}</li>`;
+  c.skills.forEach(s => { h += skillRow(s); });
+  return h + '</ul></div></details>';
+}
+function vProg() {
+  let h = reportBlock() + '<h1 class="pg">Memórias musculares</h1><p class="hint">Abra uma memória muscular para ver as especializações. Toque numa especialização para registrar o resultado do dado.</p><div class="cats">';
+  CATS.forEach(c => { h += catSection(c); });
+  h += '</div>';
+  h += `<section class="pend"><h2>Registros pendentes <span class="cnt">${PG.pending.length}</span></h2>`;
+  if (!PG.pending.length) h += '<p class="hint">Nenhum registro. Os testes ficam guardados aqui até você descansar, e só então o XP é distribuído.</p>';
+  else {
+    h += '<p class="hint">O XP só é calculado e entregue quando você tocar em Descansar.</p><ul class="plist">';
+    PG.pending.forEach(p => { h += `<li><div><b>${p.kind === 'cat' ? 'Ação instintiva: ' + esc(p.name) : esc(p.name)}</b><span>${p.region ? 'ataque em ' + esc(p.region) + ' · ' : ''}dado ${p.roll} contra ${n1(p.chance !== undefined ? p.chance : p.base)}% · ${p.ok ? 'sucesso' : 'falha'}${p.kind === 'cat' ? '' : ' · ' + (p.calm ? 'calmo' : 'pânico')}</span></div><button type="button" class="x" data-act="prm" data-id="${esc(p.id)}" aria-label="Remover registro">×</button></li>`; });
+    h += '</ul>';
+  }
+  return h + '<div class="ctl"><button type="button" class="btn" data-act="prest">Descansar (' + PG.pending.length + ')</button></div></section>';
+}
+
+
+function pAct(a, d, el) {
+  const u = PG.ui;
+  switch (a) {
+    case 'ppick': u.sel = (isSel(d.k, d.n) ? null : { kind: d.k, name: d.n }); u.last = null; u.roll = ''; break;
+    case 'pgoto': { const c = CAT_OF[d.n]; u.open[c] = true; u.sel = { kind: 'skill', name: d.n }; u.last = null; u.roll = ''; u.scrollSel = true; break; }
+    case 'pestado': u.estado = d.v; break;
+    case 'plvl': { const e = d.k === 'cat' ? PG.cats[d.n] : PG.skills[d.n]; e.lvl = Math.max(0, Math.min(10, e.lvl + parseInt(d.d, 10))); break; }
+    case 'pregister': {
+      const pn = el && el.closest && el.closest('.panel'), i = pn && pn.querySelector('input[data-chg="roll"]'); if (i) u.roll = i.value;
+      if (!u.sel) { msg('Selecione uma especialização'); return true; }
+      const roll = validRoll(u.roll); if (!roll) { msg('Digite um número inteiro de 1 a 100'); return true; }
+      const e = makeEntry(PG, u.sel.kind, u.sel.name, roll, u.estado === 'calmo'); PG.pending.push(e); u.last = { name: u.sel.name, roll, base: e.base, ok: e.ok }; u.roll = ''; break;
+    }
+    case 'qroll': u.qd = String(1 + Math.floor(Math.random() * 100)); break;
+    case 'pqreg': {
+      const i = document.getElementById('qd'); if (i && i.value !== undefined && i.value !== '') u.qd = i.value;
+      const sel = u.qsel || 'skill:Machados', k = sel.split(':')[0], n = sel.slice(sel.indexOf(':') + 1), roll = validRoll(u.qd);
+      if (!roll) { msg('Digite ou role um dado de 1 a 100'); return true; }
+      const e = makeEntry(PG, k, n, roll, u.estado === 'calmo'); PG.pending.push(e);
+      u.qlast = `${e.ok ? 'Sucesso' : 'Falha'} em ${n}: dado ${roll} contra ${e.base}%. Registrado; o XP chega no descanso.`; u.qd = ''; break;
+    }
+    case 'prm': PG.pending = PG.pending.filter(p => p.id !== d.id); break;
+    case 'prest':
+      if (!PG.pending.length) { msg('Não há registros para processar'); return true; }
+      PG.undo = JSON.stringify({ skills: PG.skills, cats: PG.cats, pending: PG.pending });
+      PG.report = processRest(PG); PG.pending = []; u.sel = null; u.last = null; msg(PG.report.ups.length ? PG.report.ups[0] : 'XP distribuído'); window.scrollTo(0, 0); break;
+    case 'pcloserep': PG.report = null; break;
+    case 'pundorest': if (PG.undo) { const o = JSON.parse(PG.undo); PG.skills = o.skills; PG.cats = o.cats; PG.pending = o.pending; PG.undo = null; PG.report = null; msg('Descanso desfeito'); } break;
+    default: return false;
+  }
+  return true;
+}
+function pChange(n, d, v, ck) {
+  const u = PG.ui;
+  if (n === 'roll') { u.roll = v; save(); return; }
+  if (n === 'qd') { u.qd = v; save(); return; }
+  if (n === 'qsel') { u.qsel = v; render(); return; }
+  if (n === 'editxp') u.editXp = ck;
+  else if (n === 'xp') { const e = d.k === 'cat' ? PG.cats[d.n] : PG.skills[d.n], x = parseFloat(String(v).replace(',', '.')); e.xp = isFinite(x) && x >= 0 ? x : 0; const ups = levelUpAll(PG); if (ups.length) msg(ups.map(x => `${x.name} foi ao Nível ${x.to}`).join('. ')); }
+  render();
+}
+function quickRoll() {
+  const u = PG.ui, sel = u.qsel || 'skill:Machados', [k, n] = [sel.split(':')[0], sel.slice(sel.indexOf(':') + 1)];
+  const ch = k === 'cat' ? pct(PG.cats[n].lvl) : pct(PG.skills[n].lvl);
+  const opts = CATS.map(c => `<optgroup label="${esc(c.id)}"><option value="cat:${esc(c.id)}"${sel === 'cat:' + c.id ? ' selected' : ''}>${esc(c.id)} (memória muscular, ${pct(PG.cats[c.id].lvl)}%)</option>` + c.skills.map(x => `<option value="skill:${esc(x)}"${sel === 'skill:' + x ? ' selected' : ''}>${esc(x)} (${pct(PG.skills[x].lvl)}%)</option>`).join('') + '</optgroup>').join('');
+  return `<div class="card"><h3>Rolar teste</h3><label class="fld">Especialização ou memória muscular<select data-chg="qsel">${opts}</select></label><div class="row"><label>Dado (1 a 100)<input type="number" id="qd" min="1" max="100" data-chg="qd" data-enter="pqreg" value="${esc(u.qd || '')}"></label><button data-act="qroll">Rolar d100</button><button class="go" data-act="pqreg">Registrar</button></div><p class="hint">Chance de ${ch}% · estado: ${u.estado === 'calmo' ? 'Calmo' : 'Pânico'} (chave no topo). Role na mesa e digite o dado, ou toque em Rolar d100. O XP chega no descanso.</p>${u.qlast ? `<p class="res">${esc(u.qlast)}</p>` : ''}</div>`;
+}
+function vFicha() {
+  const f = S.fs.find(x => x.side === 'P' && x.sheet) || S.fs.find(x => x.side === 'P');
+  let h = '<h2>Ficha</h2><div class="fgrid"><aside class="fside">';
+  if (f) {
+    h += statusBlock(f) + `<div class="card"><div class="row"><span><b>Arma:</b> ${esc(f.weapon)} (${esc(W[f.weapon][0])}, nível ${f.lvl}, ${cost(f)} ticks por golpe)</span><label>Escudo (durabilidade)<input type="number" min="0" data-f="esc" data-id="${f.id}" value="${f.esc}"></label></div><p class="hint">Armadura: ${esc(REG11.filter(r => f.arm[r.id] > 0).map(r => r.id + ' ' + f.arm[r.id] + '%').join(' · ') || 'sem proteção')}. Troque arma e armadura na aba Combate. Seus ataques entram nos registros pendentes e rendem XP no descanso.</p></div>`;
+  }
+  h += quickRoll() + '</aside><section class="fmain">' + `<div class="pgw">${vProg()}<label class="ck"><input type="checkbox" data-chg="editxp"${PG.ui.editXp ? ' checked' : ''}> Mostrar campos para editar o XP</label></div></section></div>`;
+  return h + vSalvar();
+}
+
+/* ===================== TABLETOP ===================== */
+const MC = 24, MR = 12, MS = 48;
+const MZ = { menu: false, place: 0, sx: 0, sy: 0 };
+const MSVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="4"/><path d="M3.5 23c0-5.6 3.8-9 8.5-9s8.5 3.4 8.5 9z"/></svg>';
+const mainP = () => S.fs.find(x => x.side === 'P' && x.sheet) || S.fs.find(x => x.side === 'P');
+const mtk = id => S.mesa.tk.find(t => t.id === +id);
+const mDist = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+const mFree = (x, y, ig) => x >= 0 && y >= 0 && x < MC && y < MR && !S.mesa.tk.some(t => t.id !== ig && t.x === x && t.y === y);
+function mNear(x, y, ig) {
+  x = Math.max(0, Math.min(MC - 1, x)); y = Math.max(0, Math.min(MR - 1, y));
+  for (let r = 0; r <= Math.max(MC, MR); r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) if (Math.max(Math.abs(dx), Math.abs(dy)) === r && mFree(x + dx, y + dy, ig)) return [x + dx, y + dy];
+  return [x, y];
+}
+function mPut(id, x, y) { id = +id; const c = mNear(x, y, id); let t = mtk(id); if (!t) { t = { id, x: 0, y: 0 }; S.mesa.tk.push(t); } t.x = c[0]; t.y = c[1]; }
+function mEnsure() {
+  S.mesa.tk = S.mesa.tk.filter(t => mf(t));
+  if (S.mesa.sel && !mtk(S.mesa.sel)) S.mesa.sel = 0;
+  if (MZ.place && !fig(MZ.place)) MZ.place = 0;
+  if (MZ.img && !S.mesa.im && !MZ.fit) { MZ.fit = 1; const i = new Image(); i.onload = () => { MZ.fit = 0; S.mesa.im = mAutoFit(i.naturalHeight / i.naturalWidth); render(); }; i.onerror = () => { MZ.fit = 0; }; i.src = mUrl(); }
+  if (!S.mesa.auto) { const p = mainP(); if (p) { mPut(p.id, 1, MR - 2); S.mesa.auto = true; } }
+}
+const IMGKEY = 'zomboid-mesa-img-v1';
+const mFit = ar => { const W = MC * MS, H = MR * MS, w = Math.max(W, H / ar); return { x: (W - w) / 2, y: (H - w * ar) / 2, w, ar }; };
+function mAutoFit(ar) { const p = S.mesa.pre; if (!p) return mFit(ar); S.mesa.pre = null; return { x: p.x * MC * MS, y: p.y * MR * MS, w: p.w * MC * MS, ar }; }
+const mRk = () => { const b = document.getElementById('mboard'); return b && b.offsetWidth ? (b.getBoundingClientRect().width / b.offsetWidth || 1) : 1; };
+const D_busy = () => !!document.querySelector('.mtk.drag');
+function mK() {
+  if (MZ.vz) return MZ.vz / 100;
+  const ap = typeof $ === 'function' && $('app'); if (!ap || typeof getComputedStyle !== 'function') return 1;
+  const cs = getComputedStyle(ap), Wd = ap.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 2;
+  const wr = document.querySelector('.mesa-wrap'), Hd = (wr && wr.clientHeight > 120 ? wr.clientHeight : window.innerHeight - 230) - 2;
+  return Math.round(Math.max(.2, Math.min(1, Wd / (MC * MS), Hd / (MR * MS))) * 1000) / 1000;
+}
+function mZoom(fn) {
+  const w = document.querySelector('.mesa-wrap'), k0 = mK();
+  if (w) MZ.vpos = [(w.scrollLeft + w.clientWidth / 2) / (MC * MS * k0), (w.scrollTop + w.clientHeight / 2) / (MR * MS * k0)];
+  fn(k0);
+}
+const mPct = im => Math.round(im.w / (MC * MS) * 100);
+function mStep(d) {
+  const im = S.mesa.im; if (!im || S.mesa.lock) return;
+  const cx = im.x + im.w / 2, cy = im.y + im.w * im.ar / 2, nw = MC * MS * Math.max(20, Math.min(400, mPct(im) + d)) / 100;
+  im.w = nw; im.x = cx - nw / 2; im.y = cy - nw * im.ar / 2;
+}
+function mImStyle(el, im) { el.style.left = im.x + 'px'; el.style.top = im.y + 'px'; el.style.width = im.w + 'px'; el.style.height = im.w * im.ar + 'px'; }
+function mUrl() {
+  if (!MZ.img) return '';
+  if (MZ.src !== MZ.img) {
+    try {
+      const [hd, b64] = MZ.img.split(','), bin = atob(b64), a = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+      if (MZ.blob) URL.revokeObjectURL(MZ.blob);
+      MZ.blob = URL.createObjectURL(new Blob([a], { type: (hd.match(/:(.*?);/) || [])[1] || 'image/png' })); MZ.src = MZ.img;
+    } catch (e) { MZ.img = ''; return ''; }
+  }
+  return MZ.blob;
+}
+function mSetImg(u) {
+  MZ.img = u || '';
+  try { if (u) localStorage.setItem(IMGKEY, u); else localStorage.removeItem(IMGKEY); } catch (e) { msg('Imagem grande demais para salvar: ela some ao recarregar a página'); }
+}
+function mLoadImg(file) {
+  if (!file) return;
+  if (!/^image\//.test(file.type)) return msg('Escolha um arquivo de imagem');
+  const r = new FileReader();
+  r.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, 2304 / im.width), c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      let u = c.toDataURL('image/png'); if (u.length > 2.2e6) u = c.toDataURL('image/jpeg', .85);
+      mSetImg(u); S.mesa.im = mAutoFit(c.height / c.width); render();
+    };
+    im.onerror = () => msg('Não consegui ler essa imagem');
+    im.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+function mKeep() { const w = document.querySelector('.mesa-wrap'); if (w) { MZ.sx = w.scrollLeft; MZ.sy = w.scrollTop; } }
+function mBack() { const w = document.querySelector('.mesa-wrap'); if (!w) return; if (MZ.vpos) { const k = mK(); w.scrollLeft = Math.max(0, MZ.vpos[0] * MC * MS * k - w.clientWidth / 2); w.scrollTop = Math.max(0, MZ.vpos[1] * MR * MS * k - w.clientHeight / 2); MZ.vpos = null; return; } w.scrollLeft = MZ.sx; w.scrollTop = MZ.sy; }
+function mTok(t) {
+  const f = mf(t), cls = f.side === 'P' ? 'p' : f.kind === 'zumbi' ? 'z' : 'n', dead = !f.st && f.hp <= 0;
+  return `<div class="mtk ${cls}${dead ? ' dead' : ''}${t.id === S.mesa.sel ? ' sel' : ''}" data-tid="${t.id}" data-lamp="${f.side === 'P' && f.hp > 0 ? (S.mesa.lantOff ? 3 : f.hp < 45 ? 2 : 1) : 0}" tabindex="0" role="button" aria-label="${esc(f.name)}${f.side === 'P' ? ', vida ' + Math.round(f.hp) + '%' : ''}" style="left:${t.x * MS}px;top:${t.y * MS}px"><i>${MSVG}</i><small>${esc(f.name)}</small></div>`;
+}
+function mAct(t) {
+  const f = mf(t), top = t.y === 0 ? (t.y + 1) * MS + 2 : t.y * MS - 34;
+  let b = '';
+  if (f.side === 'E') b += f.st || f.hp > 0 ? `<button class="go" data-act="mfight" data-id="${t.id}">Combater</button>` : '<span class="tg r">morto</span>';
+  b += `<button data-act="mrem" data-id="${t.id}" title="Tirar do mapa">✕</button>`;
+  return `<div class="mact" style="left:${(t.x + .5) * MS}px;top:${top}px">${b}</div>`;
+}
+function vMesa() {
+  mEnsure();
+  const pf = mainP(), sel = mtk(S.mesa.sel), npcs = S.fs.filter(f => f.side === 'E');
+  const lk = !!S.mesa.lock, dis = lk ? ' disabled' : '', im = MZ.img && S.mesa.im, kz0 = mK();
+  let h = `<div class="mbar"><div class="mrow"><button class="go" data-act="mmenu">+ Adicionar adversário</button>` + (pf && !mtk(pf.id) ? `<button data-act="mpick" data-id="${pf.id}">+ Meu boneco</button>` : '') + `<button data-act="mlant"${S.mesa.lantOff ? '' : ' class="go"'} aria-pressed="${!S.mesa.lantOff}">Lanterna: ${S.mesa.lantOff ? 'desligada' : 'ligada'}</button><button data-act="mwadd"${S.mesa.wlock ? ' disabled' : ''}>+ Parede</button><button data-act="mdadd"${S.mesa.wlock ? ' disabled' : ''}>+ Porta</button><button data-act="mimgpick"${dis}>Importar imagem do mapa</button>` + (MZ.img ? `<button data-act="mimgdel"${dis}>Remover imagem</button>` : '') + '<input type="file" id="mimg" accept="image/*" hidden></div>';
+  h += `<div class="mrow"><button data-act="mlock"${lk ? ' class="go"' : ''}>${lk ? 'Desbloquear' : 'Bloquear'} movimento do mapa</button><button data-act="mwlock"${S.mesa.wlock ? ' class="go"' : ''}>${S.mesa.wlock ? 'Desbloquear' : 'Bloquear'} paredes</button><button data-act="mundo"${(MZ.undo || []).length ? '' : ' disabled'} title="Desfazer a última ação do mapa (Ctrl+Z)">↶ Desfazer</button>` + (im ? `<button data-act="mimgdec" title="Diminuir 1%" aria-label="Diminuir imagem em 1%"${dis}>−</button><label class="mscl">Tamanho da imagem <b id="mpct">${mPct(im)}%</b><input type="range" id="mscale" min="20" max="400" step="1" value="${mPct(im)}"${dis}></label><button data-act="mimginc" title="Aumentar 1%" aria-label="Aumentar imagem em 1%"${dis}>+</button><button data-act="mimgfit"${dis}>Ajustar ao mapa</button>` : '') + '</div>';
+  h += `<div class="mrow mzoom"><span>Visão:</span><button data-act="mvfit"${MZ.vz ? '' : ' class="go"'} title="Mostra o mapa inteiro na tela">Ajustar à tela</button><button data-act="mvz" data-d="-1" aria-label="Afastar a visão">−</button><b>${Math.round(kz0 * 100)}%</b><button data-act="mvz" data-d="1" aria-label="Aproximar a visão">+</button><button data-act="mvz100">100%</button></div>`;
+  h += MZ.place ? `<p class="res">Toque numa casa do mapa para posicionar <b>${esc(fig(MZ.place).name)}</b>. <button class="lnk" data-act="mcancel">Cancelar</button></p>` : '<details class="mhelp"><summary>Ajuda <span class="tg g">boneco</span> <span class="tg y">NPC</span> <span class="tg r">zumbi</span></summary><p class="hint">Arraste os tokens para mover. Paredes: arraste a linha ou as bolinhas das pontas; com dois dedos você gira e estica. Portas: toque para abrir ou fechar (fechada bloqueia a luz); com as paredes desbloqueadas, a porta também pode ser movida. Lanterna: liga e desliga a luz do boneco. Toque num adversário e escolha “Combater”.' + (im ? (lk ? ' A imagem está bloqueada.' : ' Arraste uma área vazia do mapa para mover a imagem.') : '') + '</p></details>';
+  h += '</div>';
+  const kz = kz0;
+  h += `<div class="mesa-wrap"><div class="msz" style="width:${Math.round(MC * MS * kz)}px;height:${Math.round(MR * MS * kz)}px"><div id="mboard" class="${MZ.place ? 'placing ' : ''}${lk ? 'lock ' : ''}${im && !lk && !MZ.place ? 'imv' : ''}" style="width:${MC * MS}px;height:${MR * MS}px;transform:scale(${kz});--ik:${(1 / Math.max(kz, .5)).toFixed(3)}"><div class="mimg"${im ? ` style="background-image:url('${mUrl()}');left:${im.x}px;top:${im.y}px;width:${im.w}px;height:${im.w * im.ar}px"` : ''}></div><div class="mgrid${MZ.img ? ' img' : ''}" style="background-size:${MS}px ${MS}px"></div>${mWalls()}${S.mesa.tk.map(mTok).join('')}${mWallsTop()}<canvas id="mlight" class="mlt" width="${MC * MS}" height="${MR * MS}"></canvas>${sel ? mAct(sel) : ''}${mWallAct()}</div></div></div>`;
+  if (MZ.menu) {
+    h += '<div class="pop"><div class="popbg" data-act="mclose"></div><div class="popc"><h2>Adversários</h2>' + (npcs.length ? '<ul class="wl">' + npcs.map(f => `<li><span><b>${esc(f.name)}</b><small>${f.kind === 'zumbi' ? 'Zumbi' : 'NPC'}${f.hp <= 0 ? ' · morto' : ''}</small></span>${mtk(f.id) ? '<span class="tg g">no mapa</span>' : `<button class="go" data-act="mpick" data-id="${f.id}">Posicionar</button>`}</li>`).join('') + '</ul>' : '<p class="hint">Nenhum adversário na aba Combate ainda.</p>') + '<button data-act="mclose">Fechar</button></div></div>';
+  }
+  return h;
+}
+function mFight(id) {
+  id = +id; let n, nt = mtk(id);
+  if (id < 0) {
+    const sf = mst(id); if (!sf || !nt) return;
+    n = addF('E', sf.kind === 'zumbi' ? 'zumbi' : 'humano'); mApply(n, sf);
+    S.mesa.st = S.mesa.st.filter(x => x !== sf); nt.id = n.id;
+  } else n = fig(id);
+  if (!n || !nt) return;
+  if (n.hp <= 0) return msg('Esse adversário já está morto');
+  const ps = S.mesa.tk.filter(t => { const f = fig(t.id); return f && f.side === 'P' && f.hp > 0; }).sort((a, b) => mDist(a, nt) - mDist(b, nt));
+  const p = ps.length ? fig(ps[0].id) : mainP();
+  if (!p) return msg('Coloque o seu boneco no tabletop');
+  S.sel.P = p.id; S.sel.E = n.id; S.reg.P = ''; S.reg.E = '';
+  const nx = order()[0]; S.atk = nx && (nx.id === p.id || nx.id === n.id) ? nx.side : 'P';
+  S.mesa.sel = 0; S.tab = 'combate'; S.pop = '';
+}
+/* ===== código de mapa, fichas guardadas, confirmação ===== */
+let MAPTXT = '';
+const mst = id => S.mesa.st.find(x => x.id === -(+id));
+const mf = t => { if (t.id > 0) return fig(t.id); const x = mst(t.id); return x ? { name: x.name, side: 'E', kind: x.kind, hp: 100, st: 1 } : null; };
+function mDel(id) { mPush(mSnapStr()); id = +id; S.mesa.tk = S.mesa.tk.filter(t => t.id !== id); if (id < 0) S.mesa.st = S.mesa.st.filter(x => x.id !== -id); S.mesa.sel = 0; }
+function ask(txt, fn, ok) { MZ.cf = { txt, fn, ok: ok || 'Apagar' }; }
+function vConfirm() {
+  const c = MZ.cf; if (!c) return '';
+  return `<div class="pop" role="alertdialog" aria-modal="true"><div class="popbg" data-act="cfno"></div><div class="popc"><h2>Confirmar</h2><p>${esc(c.txt)}</p><div class="row"><button class="go" data-act="cfok">${esc(c.ok)}</button><button data-act="cfno">Cancelar</button></div></div></div>`;
+}
+const mk4 = v => Math.round(v * 10000) / 10000;
+function mClean(d) {
+  d = d || {}; const a = {}, k = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(+v || 0)));
+  REG11.forEach(r => { const v = Math.round(+(d.a || {})[r.id]); if (v > 0) a[r.id] = Math.min(80, v); });
+  return { w: W[d.w] && d.w !== 'Zumbi' ? d.w : 'Machadinha', l: k(d.l, 0, 10), fo: k(d.fo, 0, 10), ag: k(d.ag, 0, 10), hp: +d.hp > 0 ? Math.min(1000, +d.hp) : 100, a, e: k(d.e, 0, 99), m: k(d.m, 0, 80) };
+}
+function mApply(f, sf) {
+  const d = sf.f; f.name = sf.name;
+  if (sf.kind !== 'zumbi') f.weapon = d.w;
+  f.lvl = d.l; f.fo = d.fo; f.agi = d.ag; f.hp = d.hp; f.arm = Object.assign({}, d.a); f.esc = d.e; f.mord = d.m;
+}
+function mapExport(withImg) {
+  const bw = MC * MS, bh = MR * MS, im = S.mesa.im && MZ.img ? S.mesa.im : null, n = [], p = [];
+  S.mesa.tk.forEach(t => {
+    if (t.id < 0) { const x = mst(t.id); if (x) n.push({ n: x.name, k: x.kind === 'zumbi' ? 'z' : 'h', x: t.x, y: t.y, f: x.f }); return; }
+    const f = fig(t.id); if (!f) return;
+    if (f.side === 'P') { p.push({ n: f.name, x: t.x, y: t.y }); return; }
+    if (f.hp <= 0) return;
+    n.push({ n: f.name, k: f.kind === 'zumbi' ? 'z' : 'h', x: t.x, y: t.y, f: { w: f.weapon, l: f.lvl, fo: f.fo || 0, ag: f.agi || 0, hp: Math.round(f.hp * 10) / 10, a: f.arm, e: f.esc || 0, m: f.mord || 0 } });
+  });
+  const w = mWl().map(q => { const r = { x1: mk4(q.x1), y1: mk4(q.y1), x2: mk4(q.x2), y2: mk4(q.y2) }; if (q.door) { r.d = 1; r.o = q.open ? 1 : 0; } return r; });
+  if (!n.length && !p.length && !w.length && !im) return '';
+  const o = { v: 2, g: [MC, MR], im: im ? { x: mk4(im.x / bw), y: mk4(im.y / bh), w: mk4(im.w / bw), ar: mk4(im.ar) } : null, n, p, w, l: S.mesa.lantOff ? 0 : 1 };
+  if (withImg && im) o.img = MZ.img;
+  return 'ZMAP2.' + btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+}
+function mapParse(txt) {
+  const z = String(txt || '').replace(/\s+/g, ''), pre = z.slice(0, 6);
+  if (pre !== 'ZMAP1.' && pre !== 'ZMAP2.') throw new Error('Esse texto não é um código de mapa');
+  const v = pre === 'ZMAP1.' ? 1 : 2;
+  let o; try { o = JSON.parse(decodeURIComponent(escape(atob(z.slice(6))))); } catch (e) { throw new Error('Código de mapa corrompido'); }
+  if (!o || o.v !== v || !Array.isArray(o.n)) throw new Error('Código de mapa corrompido');
+  if (o.g && (o.g[0] !== MC || o.g[1] !== MR)) throw new Error('A grade do código (' + o.g[0] + '×' + o.g[1] + ') é diferente da deste mapa (' + MC + '×' + MR + ')');
+  const c = (x, hi) => Math.max(0, Math.min(hi, Math.round(+x || 0))), g = (x, hi) => Math.max(0, Math.min(hi, +x || 0)), i = o.im;
+  const img = typeof o.img === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,/.test(o.img) ? o.img : '';
+  return {
+    im: i && +i.w > 0 && isFinite(+i.x) && isFinite(+i.y) ? { x: +i.x, y: +i.y, w: +i.w, ar: +i.ar || 0 } : null,
+    img,
+    n: o.n.slice(0, 80).map(x => ({ name: String(x.n || 'NPC').slice(0, 30), kind: x.k === 'z' ? 'zumbi' : 'humano', x: c(x.x, MC - 1), y: c(x.y, MR - 1), f: mClean(x.f) })),
+    p: v === 2 && Array.isArray(o.p) ? o.p.slice(0, 40).map(x => ({ name: String(x.n || '').slice(0, 30), x: c(x.x, MC - 1), y: c(x.y, MR - 1) })) : null,
+    w: v === 2 && Array.isArray(o.w) ? o.w.slice(0, 500).filter(x => x && [x.x1, x.y1, x.x2, x.y2].every(k => isFinite(+k))).map(x => ({ x1: g(x.x1, MC), y1: g(x.y1, MR), x2: g(x.x2, MC), y2: g(x.y2, MR), door: x.d ? 1 : 0, open: x.d && x.o ? 1 : 0 })) : null,
+    lant: v === 2 ? (o.l ? 1 : 0) : null
+  };
+}
+function mapApply(o) {
+  mPush(mSnapStr());
+  S.mesa.tk = S.mesa.tk.filter(t => t.id > 0); S.mesa.st = []; S.mesa.sel = 0;
+  let np = 0;
+  if (o.p) o.p.forEach(x => { const f = S.fs.find(q => q.side === 'P' && q.name === x.name); if (f) { mPut(f.id, x.x, x.y); np++; } });
+  o.n.forEach(x => { const id = S.mesa.sn++; S.mesa.st.push({ id, name: x.name, kind: x.kind, f: x.f }); mPut(-id, x.x, x.y); });
+  if (o.w) {
+    S.mesa.walls = o.w.map((x, k) => { const r = { id: k + 1, x1: x.x1, y1: x.y1, x2: x.x2, y2: x.y2 }; if (x.door) { r.door = 1; r.open = x.open ? 1 : 0; } return r; });
+    S.mesa.wn = o.w.length; S.mesa.wsel = 0;
+  }
+  if (o.lant !== null) S.mesa.lantOff = !o.lant;
+  let w = '';
+  if (o.img) mSetImg(o.img);
+  if (o.im) {
+    const im = S.mesa.im;
+    if (o.img && o.im.ar) { S.mesa.im = { x: o.im.x * MC * MS, y: o.im.y * MR * MS, w: o.im.w * MC * MS, ar: o.im.ar }; S.mesa.pre = null; w = '. Imagem de fundo importada'; }
+    else if (o.img) { S.mesa.im = null; S.mesa.pre = { x: o.im.x, y: o.im.y, w: o.im.w }; w = '. Imagem de fundo importada'; }
+    else if (im && MZ.img) {
+      S.mesa.im = { x: o.im.x * MC * MS, y: o.im.y * MR * MS, w: o.im.w * MC * MS, ar: im.ar }; S.mesa.pre = null;
+      if (o.im.ar && Math.abs(im.ar / o.im.ar - 1) > .05) w = '. Atenção: a proporção da sua imagem é diferente da original';
+    } else { S.mesa.pre = { x: o.im.x, y: o.im.y, w: o.im.w }; w = '. A escala da imagem será aplicada quando você importar a imagem no Tabletop'; }
+  } else if (o.img) { S.mesa.im = null; S.mesa.pre = null; w = '. Imagem de fundo importada'; }
+  const nd = o.w ? o.w.filter(x => x.door).length : 0;
+  return { w, np, nd, nw: o.w ? o.w.length - nd : 0 };
+}
+function mapImportFrom(txt) {
+  let o; try { o = mapParse(txt); } catch (e) { return msg(e.message || 'Esse texto não é um código de mapa'); }
+  const go = () => { const r = mapApply(o); msg('Mapa importado: ' + o.n.length + ' NPC(s)' + (o.p ? ', ' + r.np + ' boneco(s)' : '') + (o.w ? ', ' + r.nw + ' parede(s), ' + r.nd + ' porta(s)' : '') + r.w); };
+  const tem = S.mesa.st.length || (o.w && mWl().length);
+  if (tem) ask('O mapa atual já tem ' + S.mesa.st.length + ' NPC(s) guardado(s)' + (o.w ? ' e ' + mWl().length + ' parede(s)/porta(s)' : '') + '. Importar vai apagá-los e trocar pelo conteúdo do código. Dá para desfazer em “↶ Desfazer” no Tabletop. Continuar?', go, 'Substituir'); else go();
+}
+function mapFile(file, inp) {
+  if (!file) return;
+  if (file.size > 30e6) return msg('Arquivo grande demais');
+  const r = new FileReader();
+  r.onload = () => { mapImportFrom(String(r.result || '')); save(); render(); };
+  r.onerror = () => msg('Não consegui ler o arquivo');
+  r.readAsText(file); if (inp) inp.value = '';
+}
+function panelE() {
+  const f = cur('E');
+  if (!f) return '<h2>Inimigo</h2><p class="hint">Nenhum inimigo em combate. No Tabletop, toque num adversário e escolha “Combater”.</p>';
+  return `<h2>Inimigo</h2><div class="card${f.hp <= 0 ? ' dead' : ''}"><div class="row"><b class="who${f.id === NEXT ? ' turn' : ''}">${esc(f.name)}</b><span class="tg ${f.kind === 'zumbi' ? 'r' : 'y'}">${f.kind === 'zumbi' ? 'zumbi' : 'NPC'}</span>${f.hp <= 0 ? '<span class="tg r">derrotado</span>' : ''}</div><p class="hint">Chance de acertar cada região com o seu golpe. A ficha do inimigo fica escondida.</p>${f.kind === 'zumbi' ? '' : `<label>Arma do inimigo<select data-f="weapon" data-id="${f.id}">${Object.keys(W).filter(k => k !== 'Zumbi').map(k => `<option${k === f.weapon ? ' selected' : ''}>${k}</option>`).join('')}</select></label>`}${silh('E')}<button class="lnk" data-act="delf" data-id="${f.id}">Remover ${esc(f.name)}</button></div>`;
+}
+function vMapa() {
+  mEnsure();
+  const st = S.mesa.st;
+  let h = `<h2>Código do mapa</h2><div class="card"><p class="hint">Exportar gera um código com tudo do Tabletop: tokens (bonecos e NPCs), paredes e portas (e se estão abertas), escala e posição da imagem de fundo e a lanterna. A imagem em si é grande demais para um texto: use “Baixar arquivo” para levá-la junto. Colar um código (ou abrir um arquivo) substitui paredes, portas e NPCs, ajusta a imagem e move os bonecos de mesmo nome. As fichas dos NPCs ficam só guardadas e escondidas: entram no combate quando você toca no NPC, no Tabletop, e escolhe “Combater”. Códigos antigos (ZMAP1) continuam funcionando.</p><textarea id="mapcode" class="mapcode" rows="3" placeholder="Cole aqui o código do mapa (começa com ZMAP)">${esc(MAPTXT)}</textarea><div class="row"><button data-act="mcexp">Exportar código</button><button data-act="mccopy">Copiar</button><button class="go" data-act="mcimp">Importar código colado</button></div><div class="row"><button data-act="mcfile">Baixar arquivo (com imagem)</button><button data-act="mcopen">Abrir arquivo…</button><input type="file" id="mcfile" accept=".txt,.zmap,text/plain" hidden></div>${S.mesa.pre ? '<p class="hint">Escala do código guardada: será aplicada à próxima imagem importada no Tabletop.</p>' : ''}</div>`;
+  h += `<h2>NPCs guardados (${st.length})</h2>`;
+  h += st.length ? '<ul class="wl">' + st.map(x => { const t = mtk(-x.id); return `<li><span><b>${esc(x.name)}</b><small>${x.kind === 'zumbi' ? 'Zumbi' : 'NPC'} · ficha escondida${t ? ' · casa ' + (t.x + 1) + ',' + (t.y + 1) : ''}</small></span><button class="lnk" data-act="mrem" data-id="${-x.id}">apagar</button></li>`; }).join('') + '</ul><button class="lnk" data-act="mclear">Apagar todos os NPCs do mapa</button>' : '<p class="hint">Nenhum NPC guardado.</p>';
+  h += `<details><summary>Criar NPC guardado</summary><div class="row"><label>Nome<input type="text" id="mcn" placeholder="Bandido"></label><label>Tipo<select id="mck"><option value="humano">NPC</option><option value="zumbi">Zumbi</option></select></label><label>Arma<select id="mcw">${Object.keys(W).filter(k => k !== 'Zumbi').map(k => `<option>${k}</option>`).join('')}</select></label><label>Nível<input type="number" id="mcl" min="0" max="10" value="3"></label><label>Força<input type="number" id="mcf" min="0" max="10" value="0"></label><label>Agilidade<input type="number" id="mca" min="0" max="10" value="0"></label><label>Vida %<input type="number" id="mch" min="1" value="100"></label><label>Armadura<select id="mcp">${Object.keys(PRE).map(k => `<option${k === 'Sem proteção' ? ' selected' : ''}>${k}</option>`).join('')}</select></label><button class="go" data-act="mcnew">Guardar NPC</button></div></details>`;
+  return h;
+}
+function mesaEvents() {
+  let D = null;
+  try { MZ.img = localStorage.getItem(IMGKEY) || ''; } catch (e) { MZ.img = ''; }
+  document.addEventListener('change', e => { if (e.target && e.target.id === 'mimg') mLoadImg(e.target.files[0]); else if (e.target && e.target.id === 'mcfile') mapFile(e.target.files[0], e.target); else if (e.target && e.target.id === 'mscale') render(); });
+  document.addEventListener('pointerdown', e => {
+    const el = e.target.closest && e.target.closest('.mtk'); if (!el || MZ.place || e.button > 0) return;
+    D = { el, snap: mSnapStr(), id: +el.dataset.tid, sx: e.clientX, sy: e.clientY, ox: el.offsetLeft, oy: el.offsetTop, moved: false };
+    try { el.setPointerCapture(e.pointerId); } catch (x) { }
+  });
+  document.addEventListener('pointermove', e => {
+    if (!D) return; const kk = mRk(), dx = (e.clientX - D.sx) / kk, dy = (e.clientY - D.sy) / kk;
+    if (!D.moved && Math.hypot(dx, dy) < 6) return;
+    D.moved = true; D.el.classList.add('drag'); const pm = document.querySelector('.mact'); if (pm) pm.remove();
+    D.el.style.left = Math.max(0, Math.min((MC - 1) * MS, D.ox + dx)) + 'px';
+    D.el.style.top = Math.max(0, Math.min((MR - 1) * MS, D.oy + dy)) + 'px'; mLightUpdate();
+  });
+  const end = cancel => {
+    if (!D) return; const d = D; D = null;
+    if (!cancel) {
+      if (d.moved) { mPush(d.snap); mPut(d.id, Math.round(parseFloat(d.el.style.left) / MS), Math.round(parseFloat(d.el.style.top) / MS)); S.mesa.sel = 0; }
+      else { S.mesa.sel = S.mesa.sel === d.id ? 0 : d.id; S.mesa.wsel = 0; }
+    }
+    render();
+  };
+  let I = null;
+  document.addEventListener('pointerdown', e => {
+    const b = e.target.closest && e.target.closest('#mboard');
+    if (!b || e.target.closest('.mtk,.mact,.mwhit,.mwh') || WD || MZ.place || e.button > 0) return;
+    const im = S.mesa.im, el = b.querySelector('.mimg');
+    I = { b, el, sx: e.clientX, sy: e.clientY, ox: im ? im.x : 0, oy: im ? im.y : 0, moved: false, snap: mSnapStr(), has: !!(MZ.img && im) && !S.mesa.lock };
+    if (I.has) { try { b.setPointerCapture(e.pointerId); } catch (x) { } }
+  });
+  document.addEventListener('pointermove', e => {
+    if (!I || !I.has) return; const kk = mRk(), dx = (e.clientX - I.sx) / kk, dy = (e.clientY - I.sy) / kk;
+    if (!I.moved && Math.hypot(dx, dy) < 4) return;
+    I.moved = true; const im = S.mesa.im, W = MC * MS, H = MR * MS;
+    im.x = Math.max(-im.w + 60, Math.min(W - 60, I.ox + dx)); im.y = Math.max(-im.w * im.ar + 60, Math.min(H - 60, I.oy + dy));
+    mImStyle(I.el, im);
+  });
+  const endI = cancel => { if (!I) return; const d = I; I = null; if (cancel) { if (d.moved) render(); return; } if (d.moved) mPush(d.snap); if (d.moved || S.mesa.sel || S.mesa.wsel) { if (!d.moved) { S.mesa.sel = 0; S.mesa.wsel = 0; } render(); } };
+  document.addEventListener('pointercancel', () => endI(true));
+  document.addEventListener('pointerup', () => endI(false));
+  document.addEventListener('input', e => {
+    if (!e.target || e.target.id !== 'mscale' || !S.mesa.im || S.mesa.lock) return;
+    const im = S.mesa.im, cx = im.x + im.w / 2, cy = im.y + im.w * im.ar / 2, nw = Math.max(40, MC * MS * (+e.target.value) / 100);
+    im.w = nw; im.x = cx - nw / 2; im.y = cy - nw * im.ar / 2;
+    const el = document.querySelector('.mimg'); if (el) mImStyle(el, im);
+    const l = $('mpct'); if (l) l.textContent = e.target.value + '%'; save();
+  });
+  document.addEventListener('pointerup', () => end(false));
+  document.addEventListener('pointercancel', () => end(true));
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#mboard'); if (!b || !MZ.place || e.target.closest('.mtk')) return;
+    const r = b.getBoundingClientRect(); mPush(mSnapStr()); const kk = r.width / b.offsetWidth || 1; mPut(MZ.place, Math.floor((e.clientX - r.left) / kk / MS), Math.floor((e.clientY - r.top) / kk / MS));
+    S.mesa.sel = 0; MZ.place = 0; render();
+  });
+  document.addEventListener('keydown', e => {
+    const el = e.target.closest && e.target.closest('.mtk');
+    if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); const id = +el.dataset.tid; S.mesa.sel = S.mesa.sel === id ? 0 : id; render(); }
+  });
+}
+function init() {
+  load(); fxInit(); render();
+  document.addEventListener('click', e => { const el = e.target.closest('[data-act]'); if (el) act(el.dataset.act, el.dataset, el); });
+  document.addEventListener('change', e => chg(e.target));
+  mesaEvents();
+  wallEvents();
+  window.addEventListener('resize', () => { if (S.tab === 'mesa' && !MZ.vz) { clearTimeout(MZ.rt); MZ.rt = setTimeout(() => { if (!D_busy()) render(); }, 200); } });
+  document.addEventListener('toggle', e => { const t = e.target; if (t && t.classList && t.classList.contains('cat') && t.dataset.cat) { PG.ui.open[t.dataset.cat] = t.open; save(); } }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.id === 'dr' || e.target.id === 'dg')) { e.preventDefault(); resolve(); } else if (e.key === 'Enter' && e.target.dataset && e.target.dataset.enter === 'pregister') { e.preventDefault(); PG.ui.roll = e.target.value; act('pregister', {}, e.target); } else if (e.key === 'Enter' && e.target.dataset && e.target.dataset.enter === 'pqreg') { e.preventDefault(); PG.ui.qd = e.target.value; act('pqreg', {}, e.target); } else if (e.key === 'Enter' && /^tk\d+$/.test(e.target.id)) { e.preventDefault(); act('tapply', { id: e.target.id.slice(2) }, e.target); } });
+}
+if (typeof document !== 'undefined' && typeof process === 'undefined') init();
+
+</script></body></html>
