@@ -1528,11 +1528,43 @@ function fmt0(n) { return Math.round(n).toLocaleString('pt-BR'); }
 Object.defineProperty(globalThis, 'PG', { get() { return S.prog; } });
 const xpv = n => String(Math.round(n * 10) / 10);
 function freshProg() { const skills = {}, cats = {}; CATS.forEach(c => { cats[c.id] = { lvl: 0, xp: 0 }; c.skills.forEach(s => { skills[s] = { lvl: 0, xp: 0 }; }); }); return { K: 20, skills, cats, pending: [], report: null, undo: null, ui: { open: {}, sel: null, roll: '', estado: 'calmo', last: null, editXp: false, scrollSel: false } }; }
+
 function fixState() {
-  if (!S.mesa || !Array.isArray(S.mesa.tk)) S.mesa = { tk: [], sel: 0, auto: false, lock: false, st: [], sn: 1 };
-  S.mesa.sel = 0; if (!Array.isArray(S.mesa.st)) S.mesa.st = []; if (!(S.mesa.sn > 0)) S.mesa.sn = 1;
-  if (!S.prog || !S.prog.skills) { S.prog = freshProg(); const sh = S.sheets[0]; if (sh) Object.keys(sh.skills).forEach(k => { if (S.prog.skills[k]) S.prog.skills[k].lvl = sh.skills[k]; }); }
-  S.fs.forEach(f => f.wounds.forEach(w => { if (!w.side) { const r = REG11.find(r => r.base === w.region); if (r) w.side = r.id; } }));
+  if (!S.mesa || !Array.isArray(S.mesa.tk)) {
+    S.mesa = { tk: [], sel: 0, auto: false, lock: false, st: [], sn: 1 };
+  }
+
+  S.mesa.sel = 0;
+
+  if (!Array.isArray(S.mesa.st)) S.mesa.st = [];
+  if (!(S.mesa.sn > 0)) S.mesa.sn = 1;
+
+  if (!Array.isArray(S.sheets)) S.sheets = [];
+  if (!Array.isArray(S.fs)) S.fs = [];
+
+  S.fs.forEach(f => {
+    if (!Array.isArray(f.wounds)) f.wounds = [];
+
+    f.wounds.forEach(w => {
+      if (!w.side) {
+        const r = REG11.find(r => r.base === w.region);
+        if (r) w.side = r.id;
+      }
+    });
+  });
+
+  if (!S.prog || !S.prog.skills) {
+    S.prog = freshProg();
+    const sh = S.sheets[0];
+
+    if (sh && sh.skills) {
+      Object.keys(sh.skills).forEach(k => {
+        if (S.prog.skills[k]) S.prog.skills[k].lvl = sh.skills[k];
+      });
+    }
+  }
+}
+ 
 }
 function syncLv() {
   const sh = S.sheets[0]; if (!sh || !PG) return;
